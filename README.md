@@ -1,1 +1,3 @@
-# hg-bitbattle-api
+# Game Analytics dashboard & API
+
+A self-hosted, real-time dashboard service for your games that allows you to register player activity, statistics and game history.
