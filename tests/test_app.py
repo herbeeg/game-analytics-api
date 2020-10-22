@@ -1,6 +1,8 @@
 import pytest
 
-from app.main import app
+from pathlib import Path
+
+from app.main import app, initDb
 
 class TestMainCase:
     @pytest.fixture
@@ -15,3 +17,7 @@ class TestMainCase:
         
         assert 200 == response.status_code
         assert b'There is no ignorance, there is knowledge.' == response.data
+
+    def testDatabase(self):
+        initDb()
+        assert Path('analytics.db').is_file()
