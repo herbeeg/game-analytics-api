@@ -29,6 +29,9 @@ def initDb():
 
         db.commit()
 
+        db.execute('INSERT INTO users (email, password) values ("admin", "password")')
+        db.commit()
+
 def getDb():
     """
     Open database connection.
