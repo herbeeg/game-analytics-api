@@ -53,19 +53,34 @@ class TestMainCase:
         assert Path('test.db').is_file()
 
     def testRegister(self, client):
-        return
+        rv = register(client, 'newuser@test.com', app.config['PASSWORD'])
+        assert b'Registration successful.'
+
+        rv = login(client, 'newuser@test.com', app.config['PASSWORD'])
+        assert 200 == rv.status_code
+        assert b'Login successful.' in rv.data
+
+        rv = logout(client)
+        assert 200 == rv.status_code
+        assert b'Logout successful.' in rv.data
+
+        rv = register(client, app.config['EMAIL'], app.config['PASSWORD'])
+        assert 400 == rv.status_code
+        assert b'A user with that email already exists.'
 
     def testLoginLogout(self, client):
         rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
-        assert b'You were logged in.' in rv.data
+        assert 200 == rv.status_code
+        assert b'Login successful.' in rv.data
 
         rv = logout(client)
-        assert b'You were logged out.' in rv.data
+        assert 200 == rv.status_code
+        assert b'Logout successful.' in rv.data
 
         rv = login(client, app.config['EMAIL'] + 'j', app.config['PASSWORD'])
-        assert b'Invalid email.' in rv.data
         assert 400 == rv.status_code
+        assert b'Invalid email.' in rv.data
 
         rv = login(client, app.config['EMAIL'], app.config['PASSWORD'] + 'j')
-        assert b'Invalid password' in rv.data
         assert 400 == rv.status_code
+        assert b'Invalid password.' in rv.data
