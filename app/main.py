@@ -1,6 +1,6 @@
 import sqlite3
 
-from flask import Flask, g
+from flask import Flask, g, jsonify, request
 
 DATABASE = "analytics.db"
 
@@ -52,6 +52,31 @@ def close_db(error):
 @app.route('/')
 def index():
     return 'There is no ignorance, there is knowledge.'
+
+@app.route('/login', methods=['POST'])
+def login():
+    """
+    Manage user login authentication via
+    POST only, through offsite React
+    input fields.
+    """
+    error = None
+
+    if 'POST' == request.method:
+        if app.config['EMAIL'] != request.form['email']:
+            error = 'Invalid email.'
+        elif app.config['PASSWORD'] != request.form['password']:
+            error = 'Invalid password.'
+        else:
+            message = 'Login successful.'
+
+            return jsonify({
+                'message': message
+            }), 200
+
+        return jsonify({
+            'message': error
+        }), 400
 
 if '__main__' == __name__:
     app.run(port=5000)

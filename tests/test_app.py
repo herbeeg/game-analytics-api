@@ -1,3 +1,4 @@
+import json
 import pytest
 
 from pathlib import Path
@@ -71,16 +72,16 @@ class TestMainCase:
     def testLoginLogout(self, client):
         rv = self.login(client, app.config['EMAIL'], app.config['PASSWORD'])
         assert 200 == rv.status_code
-        assert b'Login successful.' in rv.data
+        assert 'Login successful.' in json.loads(rv.data)['message']
 
         rv = self.logout(client)
         assert 200 == rv.status_code
-        assert b'Logout successful.' in rv.data
+        assert 'Logout successful.' in json.loads(rv.data)['message']
 
         rv = self.login(client, app.config['EMAIL'] + 'j', app.config['PASSWORD'])
         assert 400 == rv.status_code
-        assert b'Invalid email.' in rv.data
+        assert 'Invalid email.' in json.loads(rv.data)['message']
 
         rv = self.login(client, app.config['EMAIL'], app.config['PASSWORD'] + 'j')
         assert 400 == rv.status_code
-        assert b'Invalid password.' in rv.data
+        assert 'Invalid password.' in json.loads(rv.data)['message']
