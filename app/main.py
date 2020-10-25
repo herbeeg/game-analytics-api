@@ -36,7 +36,7 @@ def getDb():
     """
     Open database connection.
     """
-    if not hasattr(g, 'analytics.db'):
+    if not hasattr(g, 'sqlite_db'):
         g.sqlite_db = connectDb()
 
     return g.sqlite_db
@@ -46,7 +46,7 @@ def close_db(error):
     """
     Close database connection.
     """
-    if hasattr(g, 'analytics.db'):
+    if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
 @app.route('/')
