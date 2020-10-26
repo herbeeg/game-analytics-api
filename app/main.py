@@ -1,4 +1,4 @@
-import sqlite3
+import os, sqlite3
 
 from flask import Flask, g, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
@@ -11,7 +11,10 @@ DATABASE = "analytics.db"
 EMAIL = 'admin@test.com'
 PASSWORD = 'password'
 SECRET_KEY = b'*\x15ulC6\xd0n\x0b]\xb3\xac\xf0+\x97\x8c'
-SQLALCHEMY_DATABASE_URI = f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
+SQLALCHEMY_DATABASE_URI = os.getenv(
+    'DATABASE_URL',
+    f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
+)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 app = Flask(__name__)
