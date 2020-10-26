@@ -43,6 +43,10 @@ class TestMainCase:
             '/logout',
             follow_redirects=False
         )
+    
+    def resetAppConfig(self):
+        app.config['EMAIL'] = 'admin@test.com'
+        app.config['PASSWORD'] = 'password'
 
     def testIndex(self, client):
         response = client.get('/', content_type='html/text')
@@ -55,19 +59,23 @@ class TestMainCase:
 
     def testRegister(self, client):
         rv = self.register(client, 'newuser@test.com', app.config['PASSWORD'])
-        assert b'Registration successful.'
+        assert 'Registration successful.' in json.loads(rv.data)['message']
+
+        app.config['EMAIL'] = 'newuser@test.com'
 
         rv = self.login(client, 'newuser@test.com', app.config['PASSWORD'])
         assert 200 == rv.status_code
-        assert b'Login successful.' in rv.data
+        assert 'Login successful.' in json.loads(rv.data)['message']
 
         rv = self.logout(client)
         assert 200 == rv.status_code
-        assert b'Logout successful.' in rv.data
+        assert 'Logout successful.' in json.loads(rv.data)['message']
 
         rv = self.register(client, app.config['EMAIL'], app.config['PASSWORD'])
         assert 400 == rv.status_code
-        assert b'A user with that email already exists.'
+        assert 'A user with that email already exists.' in json.loads(rv.data)['message']
+
+        self.resetAppConfig()
 
     def testLoginLogout(self, client):
         rv = self.login(client, app.config['EMAIL'], app.config['PASSWORD'])

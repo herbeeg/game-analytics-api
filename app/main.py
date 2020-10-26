@@ -53,6 +53,44 @@ def close_db(error):
 def index():
     return 'There is no ignorance, there is knowledge.'
 
+@app.route('/register', methods=['POST'])
+def register():
+    """
+    Allow users to register themselves for
+    the service using a unique email
+    address and password.
+    """
+    error = None
+
+    if 'POST' == request.method:
+        db = getDb()
+        sel = db.execute(
+            'SELECT * FROM users WHERE email = ?',
+            [request.form['email']]
+        )
+        entries = sel.fetchall()
+
+        if entries:
+            error = 'A user with that email already exists.'
+        else:
+            db.execute(
+                'INSERT INTO users (email, password) values (?, ?)',
+                [request.form['email'], request.form['password']]
+            )
+            db.commit()
+
+            message = 'Registration successful.'
+
+            sel = db.execute('SELECT * FROM users')
+            entries = sel.fetchall()
+
+            return jsonify({
+                'message': message
+            }), 200
+        return jsonify({
+            'message': error
+        }), 400
+
 @app.route('/login', methods=['POST'])
 def login():
     """
@@ -77,6 +115,18 @@ def login():
         return jsonify({
             'message': error
         }), 400
+
+@app.route('/logout')
+def logout():
+    """
+    Invalidate current user session via
+    a GET request.
+    """
+    message = 'Logout successful.'
+
+    return jsonify({
+        'message': message
+    }), 200
 
 if '__main__' == __name__:
     app.run(port=5000)
