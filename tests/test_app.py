@@ -3,7 +3,7 @@ import pytest
 
 from pathlib import Path
 
-from app.main import app, initDb
+from app.main import app, db
 
 TEST_DB = 'test.db'
 
@@ -14,15 +14,14 @@ class TestMainCase:
 
         app.config['TESTING'] = True
         app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)
-        app.config['EMAIL'] = 'admin@test.com'
-        app.config['PASSWORD'] = 'password'
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR.joinpath(TEST_DB)}'
 
-        initDb()
+        db.create_all()
 
         with app.test_client(self) as client:
             yield client
 
-        initDb()
+        db.drop_all()
 
     def register(self, client, email, password):
         return client.post(

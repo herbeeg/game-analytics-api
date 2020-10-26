@@ -1,56 +1,25 @@
 import sqlite3
 
 from flask import Flask, g, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
+
+from pathlib import Path
+
+basedir = Path(__file__).resolve().parent
 
 DATABASE = "analytics.db"
 EMAIL = 'admin@test.com'
 PASSWORD = 'password'
 SECRET_KEY = b'*\x15ulC6\xd0n\x0b]\xb3\xac\xf0+\x97\x8c'
+SQLALCHEMY_DATABASE_URI = f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 app = Flask(__name__)
-
 app.config.from_object(__name__)
 
-def connectDb():
-    """
-    Connect to the database.
-    """
-    rv = sqlite3.connect(app.config['DATABASE'])
-    rv.row_factory = sqlite3.Row
+db = SQLAlchemy(app)
 
-    return rv
-
-def initDb():
-    """
-    Create the database.
-    """
-    with app.app_context():
-        db = getDb()
-
-        with app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-
-        db.commit()
-
-        db.execute('INSERT INTO users (email, password) values ("admin", "password")')
-        db.commit()
-
-def getDb():
-    """
-    Open database connection.
-    """
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connectDb()
-
-    return g.sqlite_db
-
-@app.teardown_appcontext
-def close_db(error):
-    """
-    Close database connection.
-    """
-    if hasattr(g, 'sqlite_db'):
-        g.sqlite_db.close()
+from app import models
 
 @app.route('/')
 def index():
@@ -66,26 +35,16 @@ def register():
     error = None
 
     if 'POST' == request.method:
-        db = getDb()
-        sel = db.execute(
-            'SELECT * FROM users WHERE email = ?',
-            [request.form['email']]
-        )
-        entries = sel.fetchall()
+        users = db.session.query(models.User).filter_by(email=request.form['email']).all()
 
-        if entries:
+        if users:
             error = 'A user with that email already exists.'
         else:
-            db.execute(
-                'INSERT INTO users (email, password) values (?, ?)',
-                [request.form['email'], request.form['password']]
-            )
-            db.commit()
+            new_user = models.User(request.form['email'], request.form['password'])
+            db.session.add(new_user)
+            db.session.commit()
 
             message = 'Registration successful.'
-
-            sel = db.execute('SELECT * FROM users')
-            entries = sel.fetchall()
 
             return jsonify({
                 'message': message
