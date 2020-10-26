@@ -45,6 +45,12 @@ class TestMainCase:
         )
     
     def resetAppConfig(self):
+        """
+        Allowing on the fly changes to the
+        app config where the fields can
+        be reset back to the defaults
+        at any time.
+        """
         app.config['EMAIL'] = 'admin@test.com'
         app.config['PASSWORD'] = 'password'
 
@@ -62,6 +68,7 @@ class TestMainCase:
         assert 'Registration successful.' in json.loads(rv.data)['message']
 
         app.config['EMAIL'] = 'newuser@test.com'
+        """Update app config email to allow checks against existing database rows."""
 
         rv = self.login(client, 'newuser@test.com', app.config['PASSWORD'])
         assert 200 == rv.status_code
@@ -76,6 +83,7 @@ class TestMainCase:
         assert 'A user with that email already exists.' in json.loads(rv.data)['message']
 
         self.resetAppConfig()
+        """Set app config back to defaults for the remainder of the test suite."""
 
     def testLoginLogout(self, client):
         rv = self.login(client, app.config['EMAIL'], app.config['PASSWORD'])

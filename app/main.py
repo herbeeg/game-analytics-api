@@ -3,6 +3,9 @@ import sqlite3
 from flask import Flask, g, jsonify, request
 
 DATABASE = "analytics.db"
+EMAIL = 'admin@test.com'
+PASSWORD = 'password'
+SECRET_KEY = b'*\x15ulC6\xd0n\x0b]\xb3\xac\xf0+\x97\x8c'
 
 app = Flask(__name__)
 
