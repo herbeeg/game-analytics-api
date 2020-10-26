@@ -81,7 +81,7 @@ def login():
             'message': error
         }), 400
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET'])
 def logout():
     """
     Invalidate current user session via
