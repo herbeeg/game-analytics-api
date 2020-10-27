@@ -38,12 +38,12 @@ def register():
     error = None
 
     if 'POST' == request.method:
-        users = db.session.query(models.User).filter_by(email=request.form['email']).all()
+        users = db.session.query(models.User).filter_by(email=request.json['email']).all()
 
         if users:
             error = 'A user with that email already exists.'
         else:
-            new_user = models.User(request.form['email'], request.form['password'])
+            new_user = models.User(request.json['email'], request.json['password'])
             db.session.add(new_user)
             db.session.commit()
 
@@ -66,9 +66,9 @@ def login():
     error = None
 
     if 'POST' == request.method:
-        if app.config['EMAIL'] != request.form['email']:
+        if app.config['EMAIL'] != request.json['email']:
             error = 'Invalid email.'
-        elif app.config['PASSWORD'] != request.form['password']:
+        elif app.config['PASSWORD'] != request.json['password']:
             error = 'Invalid password.'
         else:
             message = 'Login successful.'

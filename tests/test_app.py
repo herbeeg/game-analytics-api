@@ -26,15 +26,15 @@ class TestMainCase:
     def register(self, client, email, password):
         return client.post(
             '/register',
-            data={'email': email, 'password': password},
-            follow_redirects=False
+            data=json.dumps({'email': email, 'password': password}),
+            content_type='application/json'
         )
 
     def login(self, client, email, password):
         return client.post(
             '/login',
-            data={'email': email, 'password': password},
-            follow_redirects=False
+            data=json.dumps({'email': email, 'password': password}),
+            content_type='application/json'
         )
 
     def logout(self, client):
