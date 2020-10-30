@@ -1,22 +1,21 @@
 import datetime, os, sqlite3
 
+from dotenv import find_dotenv, load_dotenv
 from flask import Flask, g, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from werkzeug.security import check_password_hash, generate_password_hash
 
 basedir = Path(__file__).resolve().parent
+load_dotenv(find_dotenv())
 
-DATABASE = "analytics.db"
-EMAIL = 'admin@test.com'
-USERNAME = 'admin'
-PASSWORD = 'password'
-SECRET_KEY = b'*\x15ulC6\xd0n\x0b]\xb3\xac\xf0+\x97\x8c'
+DATABASE = os.getenv('DATABASE')
+SECRET_KEY = os.getenv('SECRET_KEY')
 SQLALCHEMY_DATABASE_URI = os.getenv(
     'DATABASE_URL',
     f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
 )
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 
 app = Flask(__name__)
 app.config.from_object(__name__)
