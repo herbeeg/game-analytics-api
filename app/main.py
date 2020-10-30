@@ -9,6 +9,7 @@ basedir = Path(__file__).resolve().parent
 
 DATABASE = "analytics.db"
 EMAIL = 'admin@test.com'
+USERNAME = 'admin'
 PASSWORD = 'password'
 SECRET_KEY = b'*\x15ulC6\xd0n\x0b]\xb3\xac\xf0+\x97\x8c'
 SQLALCHEMY_DATABASE_URI = os.getenv(

@@ -23,10 +23,10 @@ class TestMainCase:
 
         db.drop_all()
 
-    def register(self, client, email, password):
+    def register(self, client, email, username, password):
         return client.post(
             '/register',
-            data=json.dumps({'email': email, 'password': password}),
+            data=json.dumps({'email': email, 'username': username, 'password': password}),
             content_type='application/json'
         )
 
@@ -51,6 +51,7 @@ class TestMainCase:
         at any time.
         """
         app.config['EMAIL'] = 'admin@test.com'
+        app.config['USERNAME'] = 'admin'
         app.config['PASSWORD'] = 'password'
 
     def testIndex(self, client):
@@ -63,7 +64,7 @@ class TestMainCase:
         assert Path('test.db').is_file()
 
     def testRegister(self, client):
-        rv = self.register(client, 'newuser@test.com', app.config['PASSWORD'])
+        rv = self.register(client, 'newuser@test.com', 'newuser', app.config['PASSWORD'])
         assert 'Registration successful.' in json.loads(rv.data)['message']
 
         app.config['EMAIL'] = 'newuser@test.com'
@@ -77,7 +78,11 @@ class TestMainCase:
         assert 200 == rv.status_code
         assert 'Logout successful.' in json.loads(rv.data)['message']
 
-        rv = self.register(client, app.config['EMAIL'], app.config['PASSWORD'])
+        rv = self.register(client, 'j' + app.config['EMAIL'], 'newuser', app.config['PASSWORD'])
+        assert 400 == rv.status_code
+        assert 'A user with that name already exists.' in json.loads(rv.data)['message']
+
+        rv = self.register(client, app.config['EMAIL'], 'newuser1', app.config['PASSWORD'])
         assert 400 == rv.status_code
         assert 'A user with that email already exists.' in json.loads(rv.data)['message']
 
