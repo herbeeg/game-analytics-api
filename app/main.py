@@ -70,9 +70,11 @@ def login():
     error = None
 
     if 'POST' == request.method:
-        if app.config['EMAIL'] != request.json['email']:
+        users = db.session.query(models.User).filter_by(email=request.json['email']).all()
+
+        if not users:
             error = 'Invalid email.'
-        elif app.config['PASSWORD'] != request.json['password']:
+        elif users[0].password != request.json['password']:
             error = 'Invalid password.'
         else:
             message = 'Login successful.'
