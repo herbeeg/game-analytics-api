@@ -1,4 +1,4 @@
-import os, sqlite3
+import datetime, os, sqlite3
 
 from flask import Flask, g, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
@@ -47,7 +47,12 @@ def register():
         elif usernames:
             error = 'A user with that name already exists.'
         else:
-            new_user = models.User(request.json['email'], request.json['username'], generate_password_hash(request.json['password']))
+            new_user = models.User(
+                request.json['email'], 
+                request.json['username'], 
+                generate_password_hash(request.json['password']), 
+                datetime.datetime.utcnow()
+            )
             db.session.add(new_user)
             db.session.commit()
 
