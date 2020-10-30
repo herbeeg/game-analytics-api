@@ -22,7 +22,7 @@ app.config.from_object(__name__)
 
 db = SQLAlchemy(app)
 
-from app import models
+from api.models import User
 
 @app.route('/')
 def index():
@@ -38,15 +38,15 @@ def register():
     error = None
 
     if 'POST' == request.method:
-        emails = db.session.query(models.User).filter_by(email=request.json['email']).all()
-        usernames = db.session.query(models.User).filter_by(username=request.json['username']).all()
+        emails = db.session.query(User).filter_by(email=request.json['email']).all()
+        usernames = db.session.query(User).filter_by(username=request.json['username']).all()
 
         if emails:
             error = 'A user with that email already exists.'
         elif usernames:
             error = 'A user with that name already exists.'
         else:
-            new_user = models.User(
+            new_user = User(
                 request.json['email'], 
                 request.json['username'], 
                 generate_password_hash(request.json['password']), 
@@ -74,7 +74,7 @@ def login():
     error = None
 
     if 'POST' == request.method:
-        users = db.session.query(models.User).filter_by(email=request.json['email']).all()
+        users = db.session.query(User).filter_by(email=request.json['email']).all()
 
         if not users:
             error = 'Invalid email.'
