@@ -10,10 +10,12 @@ class User(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False)
+    username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
 
-    def __init__(self, email, password):
+    def __init__(self, email, username, password):
         self.email = email
+        self.username = username
         self.password = password
 
     def __repr__(self):

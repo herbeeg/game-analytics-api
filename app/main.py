@@ -39,12 +39,15 @@ def register():
     error = None
 
     if 'POST' == request.method:
-        users = db.session.query(models.User).filter_by(email=request.json['email']).all()
+        emails = db.session.query(models.User).filter_by(email=request.json['email']).all()
+        usernames = db.session.query(models.User).filter_by(username=request.json['username']).all()
 
-        if users:
+        if emails:
             error = 'A user with that email already exists.'
+        elif usernames:
+            error = 'A user with that name already exists.'
         else:
-            new_user = models.User(request.json['email'], request.json['password'])
+            new_user = models.User(request.json['email'], request.json['username'], request.json['password'])
             db.session.add(new_user)
             db.session.commit()
 
