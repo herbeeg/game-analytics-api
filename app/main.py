@@ -2,8 +2,8 @@ import os, sqlite3
 
 from flask import Flask, g, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-
 from pathlib import Path
+from werkzeug.security import check_password_hash, generate_password_hash
 
 basedir = Path(__file__).resolve().parent
 
@@ -47,7 +47,7 @@ def register():
         elif usernames:
             error = 'A user with that name already exists.'
         else:
-            new_user = models.User(request.json['email'], request.json['username'], request.json['password'])
+            new_user = models.User(request.json['email'], request.json['username'], generate_password_hash(request.json['password']))
             db.session.add(new_user)
             db.session.commit()
 
@@ -74,7 +74,7 @@ def login():
 
         if not users:
             error = 'Invalid email.'
-        elif users[0].password != request.json['password']:
+        elif not check_password_hash(users[0].password, request.json['password']):
             error = 'Invalid password.'
         else:
             message = 'Login successful.'
