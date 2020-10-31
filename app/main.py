@@ -1,7 +1,8 @@
 import datetime, os, sqlite3
 
 from dotenv import find_dotenv, load_dotenv
-from flask import Flask, g, jsonify, request
+from flask import Flask, jsonify, request
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -11,6 +12,7 @@ load_dotenv(find_dotenv())
 
 DATABASE = os.getenv('DATABASE')
 SECRET_KEY = os.getenv('SECRET_KEY')
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 SQLALCHEMY_DATABASE_URI = os.getenv(
     'DATABASE_URL',
     f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
@@ -19,6 +21,9 @@ SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+
+jwt = JWTManager(app)
+"""Setup the Flask-JWT-Extended extension."""
 
 db = SQLAlchemy(app)
 
@@ -82,8 +87,10 @@ def login():
             error = 'Invalid password.'
         else:
             message = 'Login successful.'
+            access_token = create_access_token(identity=users[0].username)
 
             return jsonify({
+                'access_token': access_token,
                 'message': message
             }), 200
 
@@ -101,6 +108,15 @@ def logout():
 
     return jsonify({
         'message': message
+    }), 200
+
+@app.route('/profile/<user_id>', methods=['GET'])
+@jwt_required
+def profile(user_id):
+    current_user = get_jwt_identity()
+
+    return jsonify({
+        'logged_in_as': current_user
     }), 200
 
 if '__main__' == __name__:

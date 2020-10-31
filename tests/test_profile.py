@@ -6,6 +6,8 @@ from pathlib import Path
 from app.main import app, db, models
 from tests.utils import login, logout, register
 
+TEST_DB = 'test.db'
+
 class TestProtectedProfile:
     @pytest.fixture
     def client(self):
@@ -34,8 +36,15 @@ class TestProtectedProfile:
             '/profile/1',
             headers={
                 'Authorization': 'Bearer ' + json.loads(rv.data)['access_token']
-            }
+            },
             follow_redirects=False
         )
 
         assert 200 == response.status_code
+
+        response = client.get(
+            '/profile/1',
+            follow_redirects=False
+        )
+
+        assert 401 == response.status_code
