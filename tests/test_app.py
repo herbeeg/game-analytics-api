@@ -5,6 +5,7 @@ import datetime
 from pathlib import Path
 
 from app.main import app, db, models
+from tests.utils import login, logout, register
 
 TEST_DB = 'test.db'
 
@@ -28,26 +29,6 @@ class TestMainCase:
 
         db.drop_all()
 
-    def register(self, client, email, username, password):
-        return client.post(
-            '/register',
-            data=json.dumps({'email': email, 'username': username, 'password': password}),
-            content_type='application/json'
-        )
-
-    def login(self, client, email, password):
-        return client.post(
-            '/login',
-            data=json.dumps({'email': email, 'password': password}),
-            content_type='application/json'
-        )
-
-    def logout(self, client):
-        return client.get(
-            '/logout',
-            follow_redirects=False
-        )
-
     def testIndex(self, client):
         response = client.get('/', content_type='html/text')
         
@@ -62,45 +43,45 @@ class TestMainCase:
         """Update app config email to allow checks against existing database rows."""
         app.config['USERNAME'] = 'newuser'
 
-        rv = self.register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
         assert 'Registration successful.' in json.loads(rv.data)['message']
         
         users = db.session.query(models.User).filter_by(email=app.config['EMAIL']).all()
         assert datetime.datetime.now().strftime('%Y-%m-%d') == users[0].created_at.strftime('%Y-%m-%d')
         """Fairly vague check to ensure that the created_at timestamp is on the same day."""
 
-        rv = self.login(client, app.config['EMAIL'], app.config['PASSWORD'])
+        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
         assert 200 == rv.status_code
         assert 'Login successful.' in json.loads(rv.data)['message']
 
-        rv = self.logout(client)
+        rv = logout(client)
         assert 200 == rv.status_code
         assert 'Logout successful.' in json.loads(rv.data)['message']
 
-        rv = self.register(client, 'j' + app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = register(client, 'j' + app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
         assert 400 == rv.status_code
         assert 'A user with that name already exists.' in json.loads(rv.data)['message']
 
-        rv = self.register(client, app.config['EMAIL'], app.config['USERNAME'] + '1', app.config['PASSWORD'])
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'] + '1', app.config['PASSWORD'])
         assert 400 == rv.status_code
         assert 'A user with that email already exists.' in json.loads(rv.data)['message']
 
     def testLoginLogout(self, client):
-        rv = self.register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
         assert 200 == rv.status_code
 
-        rv = self.login(client, app.config['EMAIL'], app.config['PASSWORD'])
+        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
         assert 200 == rv.status_code
         assert 'Login successful.' in json.loads(rv.data)['message']
 
-        rv = self.logout(client)
+        rv = logout(client)
         assert 200 == rv.status_code
         assert 'Logout successful.' in json.loads(rv.data)['message']
 
-        rv = self.login(client, app.config['EMAIL'] + 'j', app.config['PASSWORD'])
+        rv = login(client, app.config['EMAIL'] + 'j', app.config['PASSWORD'])
         assert 400 == rv.status_code
         assert 'Invalid email.' in json.loads(rv.data)['message']
 
-        rv = self.login(client, app.config['EMAIL'], app.config['PASSWORD'] + 'j')
+        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'] + 'j')
         assert 400 == rv.status_code
         assert 'Invalid password.' in json.loads(rv.data)['message']
