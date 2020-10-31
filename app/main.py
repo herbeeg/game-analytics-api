@@ -113,11 +113,21 @@ def logout():
 @app.route('/profile/<user_id>', methods=['GET'])
 @jwt_required
 def profile(user_id):
-    current_user = get_jwt_identity()
+    username = get_jwt_identity()
+    users = db.session.query(models.User).filter_by(username=username).all()
 
+    if not users:
+        error = 'User does not exist.'
+    else:
+        return jsonify({
+            'email': users[0].email,
+            'username': username,
+            'created_at': users[0].created_at
+        }), 200
+    
     return jsonify({
-        'logged_in_as': current_user
-    }), 200
+        'message': error
+    }), 400
 
 if '__main__' == __name__:
     app.run(port=5000)
