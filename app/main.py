@@ -2,7 +2,7 @@ import datetime, os, sqlite3
 
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, jsonify, request
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt_claims
 from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -28,6 +28,15 @@ jwt = JWTManager(app)
 db = SQLAlchemy(app)
 
 from app import models
+
+@jwt.user_claims_loader
+def add_claims_to_access_token(identity):
+    users = db.session.query(models.User).filter_by(username=identity).all()
+
+    return {
+        'username': identity,
+        'id': users[0].id
+    }
 
 @app.route('/')
 def index():
@@ -113,11 +122,14 @@ def logout():
 @app.route('/profile/<user_id>', methods=['GET'])
 @jwt_required
 def profile(user_id):
+    claims = get_jwt_claims()
     username = get_jwt_identity()
-    users = db.session.query(models.User).filter_by(username=username).all()
+    users = db.session.query(models.User).filter_by(id=user_id).all()
 
     if not users:
         error = 'User does not exist.'
+    elif int(user_id) != claims['id']:
+        error = 'Cannot retrieve data from another user.'
     else:
         return jsonify({
             'email': users[0].email,

@@ -42,7 +42,7 @@ class TestProtectedProfile:
         assert 200 == response.status_code
         assert app.config['EMAIL'] in response.json['email']
         assert app.config['USERNAME'] in response.json['username']
-        
+
         date_obj = datetime.datetime.strptime(response.json['created_at'], '%a, %d %b %Y %I:%M:%S %Z')
         assert datetime.datetime.now().strftime('%Y-%m-%d') in date_obj.strftime('%Y-%m-%d')
 
@@ -55,7 +55,35 @@ class TestProtectedProfile:
 
         response = client.get(
             '/profile/117',
+            headers={
+                'Authorization': 'Bearer ' + json.loads(rv.data)['access_token']
+            },
             follow_redirects=False
         )
 
         assert 400 == response.status_code
+        assert 'User does not exist.' in response.json['message']
+
+        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'])
+        new_rv = login(client, '1' + app.config['EMAIL'], app.config['PASSWORD'])
+
+        response = client.get(
+            '/profile/2',
+            headers={
+                'Authorization': 'Bearer ' + json.loads(new_rv.data)['access_token']
+            },
+            follow_redirects=False
+        )
+
+        assert 200 == response.status_code
+
+        response = client.get(
+            '/profile/2',
+            headers={
+                'Authorization': 'Bearer ' + json.loads(rv.data)['access_token']
+            },
+            follow_redirects=False
+        )
+
+        assert 400 == response.status_code
+        assert 'Cannot retrieve data from another user.' in response.json['message']
