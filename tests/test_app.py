@@ -1,6 +1,4 @@
-import json
-import pytest
-import datetime
+import datetime, json, pytest
 
 from pathlib import Path
 
@@ -36,7 +34,7 @@ class TestMainCase:
         assert b'There is no ignorance, there is knowledge.' == response.data
 
     def testDatabase(self):
-        assert Path('test.db').is_file()
+        assert Path(TEST_DB).is_file()
 
     def testRegister(self, client):
         app.config['EMAIL'] = 'newuser@test.com'
