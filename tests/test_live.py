@@ -32,6 +32,7 @@ class TestDashboardHomeView:
         rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
 
         access_token = json.loads(rv.data)['access_token']
+        timestamp = int(datetime.datetime.utcnow().timestamp())
 
         rv = newMatch(
             client,
@@ -98,6 +99,14 @@ class TestDashboardHomeView:
         )
 
         assert 200 == rv.status_code
+        assert 'New match setup successfully.' in json.loads(rv.data)['message']
+
+        live_match = db.session.query(models.Match).filter_by(user_id=1, live=1).one()
+
+        assert 'Match 1' == live_match.title
+        assert 1 == live_match.id
+        assert 1 == live_match.user_id
+        assert timestamp < live_match.start_time
 
     def testStartMatch(self, client):
         return
