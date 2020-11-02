@@ -43,7 +43,7 @@ class TestProtectedProfile:
         assert app.config['EMAIL'] in response.json['email']
         assert app.config['USERNAME'] in response.json['username']
 
-        date_obj = datetime.datetime.strptime(response.json['created_at'], '%a, %d %b %Y %I:%M:%S %Z')
+        date_obj = datetime.datetime.strptime(response.json['created_at'], '%a, %d %b %Y %H:%M:%S %Z')
         assert datetime.datetime.now().strftime('%Y-%m-%d') in date_obj.strftime('%Y-%m-%d')
 
         response = client.get(

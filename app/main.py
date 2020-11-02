@@ -30,7 +30,7 @@ db = SQLAlchemy(app)
 from app import models
 
 @jwt.user_claims_loader
-def add_claims_to_access_token(identity):
+def addClaimsToAccessToken(identity):
     users = db.session.query(models.User).filter_by(username=identity).all()
 
     return {
