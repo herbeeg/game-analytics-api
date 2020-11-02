@@ -19,3 +19,13 @@ def logout(client):
         '/logout',
         follow_redirects=False
     )
+
+def newMatch(client, data, access_token):
+    return client.post(
+        '/match/new',
+        data=data,
+        headers={
+            'Authorization': 'Bearer ' + access_token
+        },
+        content_type='application/json'
+    )
