@@ -161,5 +161,24 @@ def profile(user_id):
         'message': error
     }), 400
 
+@app.route('/match/new', methods=['POST'])
+@jwt_required
+def newMatch():
+    claims = get_jwt_claims()
+    username = get_jwt_identity()
+
+    if not username:
+        error = 'Invalid username identity.'
+    else:
+        message = 'New match setup successfully.'
+
+        return jsonify({
+            'message': message
+        }), 200
+
+    return jsonify({
+        'message': error
+    })
+
 if '__main__' == __name__:
     app.run(port=5000)
