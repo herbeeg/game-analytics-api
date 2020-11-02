@@ -7,7 +7,7 @@ from tests.utils import login, logout, register
 
 TEST_DB = 'test.db'
 
-class TestHomeView:
+class TestDashboardHomeView:
     @pytest.fixture
     def client(self):
         BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,5 +27,21 @@ class TestHomeView:
 
         db.drop_all()
 
-    def testHome(self):
-        return
+    def testHome(self, client):
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+
+        response = client.get(
+            '/dashboard',
+            headers={
+                'Authorization': 'Bearer ' + json.loads(rv.data)['access_token']
+            },
+            follow_redirects=False
+        )
+
+        assert 200 == response.status_code
+
+        assert response.json['live_view']
+        assert response.json['stats']
+        assert response.json['last_match']
+        assert response.json['previous_matches']
