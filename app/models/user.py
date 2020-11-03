@@ -8,11 +8,11 @@ class User(db.Model):
 
     Extends the SQLAlchemy.Model class.
     """
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, nullable=False)
-    username = db.Column(db.String, nullable=False)
-    password = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.DateTime(), nullable=False)
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    email = db.Column(db.String, unique=True, nullable=False)
+    username = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, unique=False, nullable=False)
+    created_at = db.Column(db.DateTime(), unique=False, nullable=False)
 
     def __init__(self, email, username, password, created_at):
         self.email = email

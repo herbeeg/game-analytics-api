@@ -10,11 +10,11 @@ class Match(db.Model):
 
     Extends the SQLAlchemy.Model class.
     """
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=False)
-    live = db.Column(db.Integer, nullable=True)
-    title = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.Integer, nullable=False)
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    user_id = db.Column(db.Integer, unique=False, nullable=False)
+    live = db.Column(db.Integer, unique=False, nullable=True)
+    title = db.Column(db.String, unique=False, nullable=False)
+    created_at = db.Column(db.Integer, unique=False, nullable=False)
 
     def __init__(self, user_id, live, title):
         self.user_id = user_id
