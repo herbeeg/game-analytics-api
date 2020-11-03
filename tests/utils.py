@@ -20,6 +20,15 @@ def logout(client):
         follow_redirects=False
     )
 
+def profile(client, user_id, access_token):
+    return client.get(
+        f'/profile/{user_id}',
+        headers={
+            'Authorization': 'Bearer ' + access_token
+        },
+        follow_redirects=False
+    )
+
 def newMatch(client, data, access_token):
     return client.post(
         '/match/new/match-1',

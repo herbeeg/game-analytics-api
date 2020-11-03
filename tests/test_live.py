@@ -110,6 +110,9 @@ class TestLiveMatch:
         assert 1 == live_match.user_id
         assert timestamp < live_match.start_time
 
+        rv = newMatch(client, {}, '')
+        assert 422 == rv.status_code
+
     def testStartMatch(self, client):
         return
 

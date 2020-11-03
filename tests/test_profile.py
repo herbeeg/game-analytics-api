@@ -3,7 +3,7 @@ import datetime, json, pytest
 from pathlib import Path
 
 from app.main import app, db
-from tests.utils import login, logout, register
+from tests.utils import login, logout, profile, register
 
 TEST_DB = 'test.db'
 
@@ -31,13 +31,7 @@ class TestProtectedProfile:
         rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
         rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
 
-        response = client.get(
-            '/profile/1',
-            headers={
-                'Authorization': 'Bearer ' + json.loads(rv.data)['access_token']
-            },
-            follow_redirects=False
-        )
+        response = profile(client, 1, json.loads(rv.data)['access_token'])
 
         assert 200 == response.status_code
         assert app.config['EMAIL'] in response.json['email']
@@ -53,13 +47,7 @@ class TestProtectedProfile:
 
         assert 401 == response.status_code
 
-        response = client.get(
-            '/profile/117',
-            headers={
-                'Authorization': 'Bearer ' + json.loads(rv.data)['access_token']
-            },
-            follow_redirects=False
-        )
+        response = profile(client, 117, json.loads(rv.data)['access_token'])
 
         assert 400 == response.status_code
         assert 'User does not exist.' in response.json['message']
@@ -67,23 +55,11 @@ class TestProtectedProfile:
         new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'])
         new_rv = login(client, '1' + app.config['EMAIL'], app.config['PASSWORD'])
 
-        response = client.get(
-            '/profile/2',
-            headers={
-                'Authorization': 'Bearer ' + json.loads(new_rv.data)['access_token']
-            },
-            follow_redirects=False
-        )
+        response = profile(client, 2, json.loads(new_rv.data)['access_token'])
 
         assert 200 == response.status_code
 
-        response = client.get(
-            '/profile/2',
-            headers={
-                'Authorization': 'Bearer ' + json.loads(rv.data)['access_token']
-            },
-            follow_redirects=False
-        )
+        response = profile(client, 2, json.loads(rv.data)['access_token'])
 
         assert 400 == response.status_code
         assert 'Cannot retrieve data from another user.' in response.json['message']
