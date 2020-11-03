@@ -28,7 +28,59 @@ class TestLiveMatch:
         db.drop_all()
 
     def testSetupMatch(self, client):
-        test_data = json.dumps({
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+
+        access_token = json.loads(rv.data)['access_token']
+        timestamp = int(datetime.datetime.utcnow().timestamp())
+
+        time.sleep(1)
+        """Wait one second before creating a new match to allow timestamp comparisons."""
+
+        rv = newMatch(
+            client,
+            self.getMatchData(),
+            access_token
+        )
+
+        assert 200 == rv.status_code
+        assert 'New match setup successfully.' in json.loads(rv.data)['message']
+
+        live_match = db.session.query(Match).filter_by(user_id=1, live=0).one()
+
+        assert 'Match 1' == live_match.title
+        assert 1 == live_match.id
+        assert 1 == live_match.user_id
+        assert 0 == live_match.live
+        assert timestamp < live_match.created_at
+
+        rv = newMatch(
+            client,
+            self.getMatchData(),
+            ''
+        )
+        assert 422 == rv.status_code
+
+        rv = newMatch(
+            client,
+            json.dumps({}),
+            access_token
+        )
+
+        assert 400 == rv.status_code
+        assert 'Malformed match data provided.' in json.loads(rv.data)['message']
+
+    def testStartMatch(self, client):
+        return
+
+    def testEndMatch(self, client):
+        return
+
+    def testViewMatch(self, client):
+        return
+
+    def getMatchData(self):
+        return json.dumps({
             'title': 'Match 1',
             'size': {
                 'x': 16,
@@ -87,54 +139,3 @@ class TestLiveMatch:
                 ]
             }
         })
-
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
-        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
-
-        access_token = json.loads(rv.data)['access_token']
-        timestamp = int(datetime.datetime.utcnow().timestamp())
-
-        time.sleep(1)
-        """Wait one second before creating a new match to allow timestamp comparisons."""
-
-        rv = newMatch(
-            client,
-            test_data,
-            access_token
-        )
-
-        assert 200 == rv.status_code
-        assert 'New match setup successfully.' in json.loads(rv.data)['message']
-
-        live_match = db.session.query(Match).filter_by(user_id=1, live=0).one()
-
-        assert 'Match 1' == live_match.title
-        assert 1 == live_match.id
-        assert 1 == live_match.user_id
-        assert 0 == live_match.live
-        assert timestamp < live_match.created_at
-
-        rv = newMatch(
-            client,
-            test_data,
-            ''
-        )
-        assert 422 == rv.status_code
-
-        rv = newMatch(
-            client,
-            json.dumps({}),
-            access_token
-        )
-
-        assert 400 == rv.status_code
-        assert 'Malformed match data provided.' in json.loads(rv.data)['message']
-
-    def testStartMatch(self, client):
-        return
-
-    def testEndMatch(self, client):
-        return
-
-    def testViewMatch(self, client):
-        return
