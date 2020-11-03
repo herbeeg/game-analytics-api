@@ -117,16 +117,18 @@ class TestLiveMatch:
         rv = newMatch(
             client,
             test_data,
-            'a'
-        )
-        assert 401 == rv.status_code
-
-        rv = newMatch(
-            client, 
-            {}, 
             ''
         )
         assert 422 == rv.status_code
+
+        rv = newMatch(
+            client,
+            json.dumps({}),
+            access_token
+        )
+
+        assert 400 == rv.status_code
+        assert 'Malformed match data provided.' in json.loads(rv.data)['message']
 
     def testStartMatch(self, client):
         return

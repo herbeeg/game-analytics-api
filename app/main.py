@@ -176,19 +176,26 @@ def newMatch():
         if not username:
             error = 'Invalid username identity.'
         else:
-            new_match = Match(
-                claims['id'],
-                0,
-                request.json['title']
-            )
-            db.session.add(new_match)
-            db.session.commit()
+            try:
+                new_match = Match(
+                    claims['id'],
+                    0,
+                    request.json['title']
+                )
+                db.session.add(new_match)
+                db.session.commit()
 
-            message = 'New match setup successfully.'
+                message = 'New match setup successfully.'
 
-            return jsonify({
-                'message': message
-            }), 200
+                return jsonify({
+                    'message': message
+                }), 200
+            except KeyError:
+                message = 'Malformed match data provided.'
+
+                return jsonify({
+                    'message': message
+                }), 400
 
         return jsonify({
             'message': error
