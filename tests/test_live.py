@@ -93,7 +93,7 @@ class TestLiveMatch:
 
         assert 200 == rv.status_code
         assert 'Match started successfully.' in json.loads(rv.data)['message']
-        assert ('/match/view/' + uuid) in json.loads(rv.data)['match_uri']
+        assert (f'/match/view/{uuid}') in json.loads(rv.data)['match_uri']
 
         match = db.session.query(Match).filter_by(user_id=1, live=1).one()
 
