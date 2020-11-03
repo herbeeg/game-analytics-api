@@ -46,19 +46,20 @@ class TestLiveMatch:
         assert 200 == rv.status_code
         assert 'New match setup successfully.' in json.loads(rv.data)['message']
 
-        live_match = db.session.query(Match).filter_by(user_id=1, live=0).one()
+        match = db.session.query(Match).filter_by(user_id=1, live=0).one()
 
-        assert 'Match 1' == live_match.title
-        assert 1 == live_match.id
-        assert 1 == live_match.user_id
-        assert 0 == live_match.live
-        assert timestamp < live_match.created_at
+        assert 'Match 1' == match.title
+        assert 1 == match.id
+        assert 1 == match.user_id
+        assert 0 == match.live
+        assert timestamp < match.created_at
 
         rv = newMatch(
             client,
             self.getMatchData(),
             ''
         )
+
         assert 422 == rv.status_code
 
         rv = newMatch(
@@ -71,7 +72,33 @@ class TestLiveMatch:
         assert 'Malformed match data provided.' in json.loads(rv.data)['message']
 
     def testStartMatch(self, client):
-        return
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+
+        access_token = json.loads(rv.data)['access_token']
+
+        rv = newMatch(
+            client,
+            self.getMatchData(),
+            access_token
+        )
+
+        uuid = json.loads(rv.data)['uuid']
+
+        rv = startMatch(
+            client,
+            uuid,
+            access_token
+        )
+
+        assert 200 == rv.status_code
+        assert 'Match started successfully.' in json.loads(rv.data)['message']
+        assert ('/match/view/' + uuid) in json.loads(rv.data)['match_uri']
+
+        match = db.session.query(Match).filter_by(user_id=1, live=1).one()
+
+        assert 1 == match.user_id
+        assert 1 == match.live
 
     def testEndMatch(self, client):
         return
