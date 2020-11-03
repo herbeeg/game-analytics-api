@@ -1,4 +1,4 @@
-import datetime, json, pytest
+import datetime, json, pytest, time
 
 from pathlib import Path
 
@@ -34,10 +34,12 @@ class TestLiveMatch:
         access_token = json.loads(rv.data)['access_token']
         timestamp = int(datetime.datetime.utcnow().timestamp())
 
+        time.sleep(1)
+        """Wait one second before creating a new match to allow timestamp comparisons."""
+
         rv = newMatch(
             client,
             json.dumps({
-                'title': 'Match 1',
                 'size': {
                     'x': 16,
                     'y': 8

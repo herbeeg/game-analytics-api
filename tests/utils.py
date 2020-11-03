@@ -22,7 +22,7 @@ def logout(client):
 
 def newMatch(client, data, access_token):
     return client.post(
-        '/match/new',
+        '/match/new/match-1',
         data=data,
         headers={
             'Authorization': 'Bearer ' + access_token

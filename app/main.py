@@ -162,16 +162,20 @@ def profile(user_id):
         'message': error
     }), 400
 
-@app.route('/match/new', methods=['POST'])
+@app.route('/match/new/<title>', methods=['POST'])
 @jwt_required
-def newMatch():
+def newMatch(title):
     claims = get_jwt_claims()
     username = get_jwt_identity()
 
     if not username:
         error = 'Invalid username identity.'
     else:
-        new_match = Match()
+        new_match = Match(
+            claims['id'],
+            1,
+            title.replace('-', ' ').title()
+        )
         db.session.add(new_match)
         db.session.commit()
 
