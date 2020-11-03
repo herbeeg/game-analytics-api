@@ -2,7 +2,7 @@ import datetime, json, pytest
 
 from pathlib import Path
 
-from app.main import app, db, models
+from app.main import app, db, User
 from tests.utils import login, logout, register
 
 TEST_DB = 'test.db'
@@ -44,7 +44,7 @@ class TestMainCase:
         rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
         assert 'Registration successful.' in json.loads(rv.data)['message']
         
-        users = db.session.query(models.User).filter_by(email=app.config['EMAIL']).all()
+        users = db.session.query(User).filter_by(email=app.config['EMAIL']).all()
         assert datetime.datetime.now().strftime('%Y-%m-%d') == users[0].created_at.strftime('%Y-%m-%d')
         """Fairly vague check to ensure that the created_at timestamp is on the same day."""
 

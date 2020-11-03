@@ -2,12 +2,12 @@ import datetime, json, pytest
 
 from pathlib import Path
 
-from app.main import app, db, models
+from app.main import app, db, Match
 from tests.utils import login, newMatch, register
 
 TEST_DB = 'test.db'
 
-class TestDashboardHomeView:
+class TestLiveMatch:
     @pytest.fixture
     def client(self):
         BASE_DIR = Path(__file__).resolve().parent.parent
@@ -101,7 +101,7 @@ class TestDashboardHomeView:
         assert 200 == rv.status_code
         assert 'New match setup successfully.' in json.loads(rv.data)['message']
 
-        live_match = db.session.query(models.Match).filter_by(user_id=1, live=1).one()
+        live_match = db.session.query(Match).filter_by(user_id=1, live=1).one()
 
         assert 'Match 1' == live_match.title
         assert 1 == live_match.id

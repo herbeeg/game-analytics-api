@@ -2,7 +2,7 @@ import datetime, json, pytest
 
 from pathlib import Path
 
-from app.main import app, db, models
+from app.main import app, db
 from tests.utils import login, logout, register
 
 TEST_DB = 'test.db'

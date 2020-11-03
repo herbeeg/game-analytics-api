@@ -27,11 +27,12 @@ jwt = JWTManager(app)
 
 db = SQLAlchemy(app)
 
-from app import models
+from app.models.user import User
+from app.models.match import Match
 
 @jwt.user_claims_loader
 def addClaimsToAccessToken(identity):
-    users = db.session.query(models.User).filter_by(username=identity).all()
+    users = db.session.query(User).filter_by(username=identity).all()
 
     return {
         'username': identity,
@@ -52,15 +53,15 @@ def register():
     error = None
 
     if 'POST' == request.method:
-        emails = db.session.query(models.User).filter_by(email=request.json['email']).all()
-        usernames = db.session.query(models.User).filter_by(username=request.json['username']).all()
+        emails = db.session.query(User).filter_by(email=request.json['email']).all()
+        usernames = db.session.query(User).filter_by(username=request.json['username']).all()
 
         if emails:
             error = 'A user with that email already exists.'
         elif usernames:
             error = 'A user with that name already exists.'
         else:
-            new_user = models.User(
+            new_user = User(
                 request.json['email'], 
                 request.json['username'], 
                 generate_password_hash(request.json['password']), 
@@ -88,7 +89,7 @@ def login():
     error = None
 
     if 'POST' == request.method:
-        users = db.session.query(models.User).filter_by(email=request.json['email']).all()
+        users = db.session.query(User).filter_by(email=request.json['email']).all()
 
         if not users:
             error = 'Invalid email.'
@@ -144,7 +145,7 @@ def dashboard():
 def profile(user_id):
     claims = get_jwt_claims()
     username = get_jwt_identity()
-    users = db.session.query(models.User).filter_by(id=user_id).all()
+    users = db.session.query(User).filter_by(id=user_id).all()
 
     if not users:
         error = 'User does not exist.'
@@ -170,6 +171,10 @@ def newMatch():
     if not username:
         error = 'Invalid username identity.'
     else:
+        new_match = Match()
+        db.session.add(new_match)
+        db.session.commit()
+
         message = 'New match setup successfully.'
 
         return jsonify({
