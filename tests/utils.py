@@ -31,7 +31,7 @@ def profile(client, user_id, access_token):
 
 def newMatch(client, data, access_token):
     return client.post(
-        '/match/new/match-1',
+        '/match/new',
         data=data,
         headers={
             'Authorization': 'Bearer ' + access_token

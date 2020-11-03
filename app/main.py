@@ -147,6 +147,8 @@ def profile(user_id):
     username = get_jwt_identity()
     users = db.session.query(User).filter_by(id=user_id).all()
 
+    error = None
+
     if not users:
         error = 'User does not exist.'
     elif int(user_id) != claims['id']:
@@ -162,32 +164,35 @@ def profile(user_id):
         'message': error
     }), 400
 
-@app.route('/match/new/<title>', methods=['POST'])
+@app.route('/match/new', methods=['POST'])
 @jwt_required
-def newMatch(title):
+def newMatch():
     claims = get_jwt_claims()
     username = get_jwt_identity()
 
-    if not username:
-        error = 'Invalid username identity.'
-    else:
-        new_match = Match(
-            claims['id'],
-            1,
-            title.replace('-', ' ').title()
-        )
-        db.session.add(new_match)
-        db.session.commit()
+    error = None
 
-        message = 'New match setup successfully.'
+    if 'POST' == request.method:
+        if not username:
+            error = 'Invalid username identity.'
+        else:
+            new_match = Match(
+                claims['id'],
+                0,
+                request.json['title']
+            )
+            db.session.add(new_match)
+            db.session.commit()
+
+            message = 'New match setup successfully.'
+
+            return jsonify({
+                'message': message
+            }), 200
 
         return jsonify({
-            'message': message
-        }), 200
-
-    return jsonify({
-        'message': error
-    })
+            'message': error
+        }), 400
 
 if '__main__' == __name__:
     app.run(port=5000)

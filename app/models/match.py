@@ -14,13 +14,13 @@ class Match(db.Model):
     user_id = db.Column(db.Integer, nullable=False)
     live = db.Column(db.Integer, nullable=True)
     title = db.Column(db.String, nullable=False)
-    start_time = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.Integer, nullable=False)
 
     def __init__(self, user_id, live, title):
         self.user_id = user_id
         self.live = live
         self.title = title
-        self.start_time = int(datetime.datetime.utcnow().timestamp())
+        self.created_at = int(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self):
         return f'<Match {self.title}>'

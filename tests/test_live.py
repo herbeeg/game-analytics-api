@@ -28,6 +28,66 @@ class TestLiveMatch:
         db.drop_all()
 
     def testSetupMatch(self, client):
+        test_data = json.dumps({
+            'title': 'Match 1',
+            'size': {
+                'x': 16,
+                'y': 8
+            },
+            'player_1': {
+                'name': 'Player 1',
+                'characters': [
+                    {
+                        'id': 0,
+                        'start_pos': {
+                            'x': 0,
+                            'y': 0
+                        }
+                    },
+                    {
+                        'id': 1,
+                        'start_pos': {
+                            'x': 0,
+                            'y': 3
+                        }
+                    },
+                    {
+                        'id': 2,
+                        'start_pos': {
+                            'x': 0,
+                            'y': 6
+                        }
+                    }
+                ]
+            },
+            'player_2': {
+                'name': 'Player 2',
+                'characters': [
+                    {
+                        'id': 3,
+                        'start_pos': {
+                            'x': 15,
+                            'y': 0
+                        }
+                    },
+                    {
+                        'id': 4,
+                        'start_pos': {
+                            'x': 15,
+                            'y': 3
+                        }
+                    },
+                    {
+                        'id': 5,
+                        'start_pos': {
+                            'x': 15,
+                            'y': 6
+                        }
+                    }
+                ]
+            }
+        })
+
         rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
         rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
 
@@ -39,78 +99,33 @@ class TestLiveMatch:
 
         rv = newMatch(
             client,
-            json.dumps({
-                'size': {
-                    'x': 16,
-                    'y': 8
-                },
-                'player_1': {
-                    'name': 'Player 1',
-                    'characters': [
-                        {
-                            'id': 0,
-                            'start_pos': {
-                                'x': 0,
-                                'y': 0
-                            }
-                        },
-                        {
-                            'id': 1,
-                            'start_pos': {
-                                'x': 0,
-                                'y': 3
-                            }
-                        },
-                        {
-                            'id': 2,
-                            'start_pos': {
-                                'x': 0,
-                                'y': 6
-                            }
-                        }
-                    ]
-                },
-                'player_2': {
-                    'name': 'Player 2',
-                    'characters': [
-                        {
-                            'id': 3,
-                            'start_pos': {
-                                'x': 15,
-                                'y': 0
-                            }
-                        },
-                        {
-                            'id': 4,
-                            'start_pos': {
-                                'x': 15,
-                                'y': 3
-                            }
-                        },
-                        {
-                            'id': 5,
-                            'start_pos': {
-                                'x': 15,
-                                'y': 6
-                            }
-                        }
-                    ]
-                }
-            }),
+            test_data,
             access_token
         )
 
         assert 200 == rv.status_code
         assert 'New match setup successfully.' in json.loads(rv.data)['message']
 
-        live_match = db.session.query(Match).filter_by(user_id=1, live=1).one()
+        live_match = db.session.query(Match).filter_by(user_id=1, live=0).one()
 
         assert 'Match 1' == live_match.title
         assert 1 == live_match.id
         assert 1 == live_match.user_id
-        assert timestamp < live_match.start_time
+        assert 0 == live_match.live
+        assert timestamp < live_match.created_at
 
-        rv = newMatch(client, {}, '')
+        rv = newMatch(
+            client,
+            test_data,
+            'a'
+        )
+        assert 401 == rv.status_code
+
+        rv = newMatch(
+            client, 
+            {}, 
+            ''
+        )
         assert 422 == rv.status_code
 
     def testStartMatch(self, client):
