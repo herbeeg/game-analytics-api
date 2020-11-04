@@ -185,7 +185,7 @@ def newMatch():
                 db.session.add(new_match)
                 db.session.commit()
 
-                match_data = db.session.query(Match).filter_by(user_id = claims['id']).order_by(Match.created_at.desc()).one()
+                match_data = db.session.query(Match).filter_by(user_id=claims['id']).order_by(Match.created_at.desc()).one()
 
                 message = 'New match setup successfully.'
 
@@ -212,6 +212,43 @@ def newMatch():
         return jsonify({
             'message': error
         }), 400
+
+@app.route('/match/start/<uuid>', methods=['GET'])
+@jwt_required
+def startMatch(uuid):
+    claims = get_jwt_claims()
+    username = get_jwt_identity()
+
+    error = None
+
+    match = db.session.query(Match).filter_by(uuid=uuid).first()
+
+    if not match:
+        error = 'Match not found.'
+
+        return 404
+    else:
+        try:
+            match.live = 1
+            db.session.commit()
+
+            uri = f'/match/view/{match.uuid}'
+            message = 'Match started successfully.'
+
+            return jsonify({
+                'match_uri': uri,
+                'message': message
+            }), 200
+        except AttributeError:
+            error = 'Match could not be started.'
+
+            return jsonify({
+                'message': error
+            }), 400
+
+    return jsonify({
+        'message': error
+    }), 400
 
 if '__main__' == __name__:
     app.run(port=5000)

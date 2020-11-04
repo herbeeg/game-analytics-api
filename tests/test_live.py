@@ -87,20 +87,36 @@ class TestLiveMatch:
 
         assert 36 == len(uuid)
 
-        rv = startMatch(
+        response = startMatch(
             client,
             uuid,
             access_token
         )
 
-        assert 200 == rv.status_code
-        assert 'Match started successfully.' in json.loads(rv.data)['message']
-        assert (f'/match/view/{uuid}') in json.loads(rv.data)['match_uri']
+        assert 200 == response.status_code
+        assert 'Match started successfully.' in response.json['message']
+        assert (f'/match/view/{uuid}') in response.json['match_uri']
 
         match = db.session.query(Match).filter_by(user_id=1, live=1).one()
 
         assert 1 == match.user_id
         assert 1 == match.live
+
+        response = startMatch(
+            client,
+            '',
+            access_token
+        )
+
+        assert 404 == response.status_code
+
+        response = startMatch(
+            client,
+            uuid,
+            ''
+        )
+
+        assert 422 == response.status_code
 
     def testEndMatch(self, client):
         return
