@@ -38,3 +38,12 @@ def newMatch(client, data, access_token):
         },
         content_type='application/json'
     )
+
+def startMatch(client, uuid, access_token):
+    return client.get(
+        f'/match/start/{uuid}',
+        headers={
+            'Authorization': 'Bearer ' + access_token
+        },
+        follow_redirects=False
+    )

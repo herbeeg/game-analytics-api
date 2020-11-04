@@ -12,7 +12,7 @@ class Match(db.Model):
     """
     id = db.Column(db.Integer, unique=True, primary_key=True)
     user_id = db.Column(db.Integer, unique=False, nullable=False)
-    uuid = db.Column(db.String(32), unique=True, nullable=False)
+    uuid = db.Column(db.String(36), unique=True, nullable=False)
     live = db.Column(db.Integer, unique=False, nullable=True)
     title = db.Column(db.String, unique=False, nullable=False)
     created_at = db.Column(db.Integer, unique=False, nullable=False)

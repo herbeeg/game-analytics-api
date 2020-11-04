@@ -3,7 +3,7 @@ import datetime, json, pytest, time
 from pathlib import Path
 
 from app.main import app, db, Match
-from tests.utils import login, newMatch, register
+from tests.utils import login, newMatch, register, startMatch
 
 TEST_DB = 'test.db'
 
@@ -84,6 +84,8 @@ class TestLiveMatch:
         )
 
         uuid = json.loads(rv.data)['uuid']
+
+        assert 36 == len(uuid)
 
         rv = startMatch(
             client,
