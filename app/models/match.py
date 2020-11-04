@@ -1,4 +1,4 @@
-import datetime
+import datetime, uuid
 
 from app.main import db
 
@@ -12,12 +12,14 @@ class Match(db.Model):
     """
     id = db.Column(db.Integer, unique=True, primary_key=True)
     user_id = db.Column(db.Integer, unique=False, nullable=False)
+    uuid = db.Column(db.String(32), unique=True, nullable=False)
     live = db.Column(db.Integer, unique=False, nullable=True)
     title = db.Column(db.String, unique=False, nullable=False)
     created_at = db.Column(db.Integer, unique=False, nullable=False)
 
     def __init__(self, user_id, live, title):
         self.user_id = user_id
+        self.uuid = str(uuid.uuid4())
         self.live = live
         self.title = title
         self.created_at = int(datetime.datetime.utcnow().timestamp())

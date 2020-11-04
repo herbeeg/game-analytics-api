@@ -185,16 +185,28 @@ def newMatch():
                 db.session.add(new_match)
                 db.session.commit()
 
+                match_data = db.session.query(Match).filter_by(user_id = claims['id']).order_by(Match.created_at.desc()).one()
+
                 message = 'New match setup successfully.'
 
-                return jsonify({
-                    'message': message
-                }), 200
+                try:
+                    uuid = match_data.uuid
+   
+                    return jsonify({
+                        'uuid': match_data.uuid,
+                        'message': message
+                    }), 200
+                except AttributeError:
+                    error = 'Malformed uuid column data.'
+
+                    return jsonify({
+                        'message': error
+                    }), 400
             except KeyError:
-                message = 'Malformed match data provided.'
+                error = 'Malformed match data provided.'
 
                 return jsonify({
-                    'message': message
+                    'message': error
                 }), 400
 
         return jsonify({
