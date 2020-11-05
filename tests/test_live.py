@@ -102,6 +102,38 @@ class TestLiveMatch:
         assert 1 == match.user_id
         assert 1 == match.live
 
+        p1_metadata = db.session.query(MatchMeta).filter_by(match_id=uuid, key='player_1').one()
+
+        assert 'Player 1' == p1_metadata.name
+
+        assert 0 == p1_metadata.characters[0].id
+        assert 0 == p1_metadata.characters[0].position.x
+        assert 0 == p1_metadata.characters[0].position.y
+
+        assert 1 == p1_metadata.characters[1].id
+        assert 0 == p1_metadata.characters[1].position.x
+        assert 3 == p1_metadata.characters[1].position.y
+
+        assert 2 == p1_metadata.characters[2].id
+        assert 0 == p1_metadata.characters[2].position.x
+        assert 6 == p1_metadata.characters[2].position.y
+
+        p2_metadata = db.session.query(MatchMeta).filter_by(match_id=uuid, key='player_2').one()
+
+        assert 'Player 2' == p1_metadata.name
+
+        assert 3 == p1_metadata.characters[0].id
+        assert 15 == p1_metadata.characters[0].position.x
+        assert 0 == p1_metadata.characters[0].position.y
+
+        assert 4 == p1_metadata.characters[1].id
+        assert 15 == p1_metadata.characters[1].position.x
+        assert 3 == p1_metadata.characters[1].position.y
+
+        assert 5 == p1_metadata.characters[2].id
+        assert 15 == p1_metadata.characters[2].position.x
+        assert 6 == p1_metadata.characters[2].position.y
+
         response = startMatch(
             client,
             '',
@@ -136,21 +168,21 @@ class TestLiveMatch:
                 'characters': [
                     {
                         'id': 0,
-                        'start_pos': {
+                        'position': {
                             'x': 0,
                             'y': 0
                         }
                     },
                     {
                         'id': 1,
-                        'start_pos': {
+                        'position': {
                             'x': 0,
                             'y': 3
                         }
                     },
                     {
                         'id': 2,
-                        'start_pos': {
+                        'position': {
                             'x': 0,
                             'y': 6
                         }
@@ -162,21 +194,21 @@ class TestLiveMatch:
                 'characters': [
                     {
                         'id': 3,
-                        'start_pos': {
+                        'position': {
                             'x': 15,
                             'y': 0
                         }
                     },
                     {
                         'id': 4,
-                        'start_pos': {
+                        'position': {
                             'x': 15,
                             'y': 3
                         }
                     },
                     {
                         'id': 5,
-                        'start_pos': {
+                        'position': {
                             'x': 15,
                             'y': 6
                         }
