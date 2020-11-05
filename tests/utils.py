@@ -47,3 +47,12 @@ def startMatch(client, uuid, access_token):
         },
         follow_redirects=False
     )
+
+def endMatch(client, uuid, access_token):
+    return client.get(
+        f'/match/end/{uuid}',
+        headers={
+            'Authorization': 'Bearer ' + access_token
+        },
+        follow_redirects=False
+    )

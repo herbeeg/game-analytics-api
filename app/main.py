@@ -277,5 +277,60 @@ def startMatch(uuid):
         'message': error
     }), 400
 
+@app.route('/match/end/<uuid>', methods=['GET'])
+@jwt_required
+def endMatch(uuid):
+    claims = get_jwt_claims()
+    username = get_jwt_identity()
+
+    error = None
+
+    match = db.session.query(Match).filter_by(uuid=uuid).first()
+
+    if not match:
+        return 404
+    elif 0 == match.live:
+        error = 'Cannot end matches that are not in progress.'
+    elif match.user_id != claims['id']:
+        error = 'Cannot end matches owned by other users.'
+
+        return jsonify({
+            'message': error
+        }), 401
+    else:
+        try:
+            match.live = 0
+            db.session.commit()
+
+            timing_meta = {
+                'elapsed_time': int(datetime.datetime.utcnow().timestamp()) - match.created_at
+            }
+
+            match_meta = MatchMeta(
+                uuid,
+                'timing',
+                timing_meta
+            )
+            db.session.add(match_meta)
+            db.session.commit()
+
+            uri = f'/match/view/{match.uuid}'
+            message = 'Match ended successfully.'
+
+            return jsonify({
+                'match_uri': uri,
+                'message': message
+            }), 200
+        except AttributeError:
+            error = 'Match could not be ended.'
+
+            return jsonify({
+                'message': error
+            }), 400
+
+    return jsonify({
+        'message': error
+    }), 400
+
 if '__main__' == __name__:
     app.run(port=5000)
