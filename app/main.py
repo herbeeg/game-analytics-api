@@ -247,9 +247,13 @@ def startMatch(uuid):
     match = db.session.query(Match).filter_by(uuid=uuid).first()
 
     if not match:
-        error = 'Match not found.'
-
         return 404
+    elif match.user_id != claims['id']:
+        error = 'Cannot start matches owned by other users.'
+
+        return jsonify({
+            'message': error
+        }), 401
     else:
         try:
             match.live = 1

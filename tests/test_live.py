@@ -134,6 +134,33 @@ class TestLiveMatch:
         assert 15 == p2_metadata.value['characters'][2]['position']['x']
         assert 6 == p2_metadata.value['characters'][2]['position']['y']
 
+    def testStartMatchOtherOwners(self, client):
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+
+        access_token = json.loads(rv.data)['access_token']
+
+        rv = newMatch(
+            client,
+            self.getMatchData(),
+            access_token
+        )
+
+        uuid = json.loads(rv.data)['uuid']
+
+        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'])
+        new_rv = login(client, '1' + app.config['EMAIL'], app.config['PASSWORD'])
+
+        new_access_token = json.loads(new_rv.data)['access_token']
+
+        response = client.get(
+            f'/match/start/{uuid}',
+            follow_redirects=False
+        )
+
+        assert 401 == response.status_code
+        """Cannot start matches without authorisation."""
+
         response = startMatch(
             client,
             '',
@@ -141,6 +168,7 @@ class TestLiveMatch:
         )
 
         assert 404 == response.status_code
+        """Cannot start matches that don't exist in the database."""
 
         response = startMatch(
             client,
@@ -149,6 +177,17 @@ class TestLiveMatch:
         )
 
         assert 422 == response.status_code
+        """Cannot start matches without a valid access token."""
+
+        response = startMatch(
+            client,
+            uuid,
+            new_access_token
+        )
+
+        assert 401 == response.status_code
+        """Cannot start matches that were created by other users."""
+        assert 'Cannot start matches owned by other users.' in response.json['message']
 
     def testEndMatch(self, client):
         return
