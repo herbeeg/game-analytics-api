@@ -199,6 +199,14 @@ def newMatch():
                     db.session.add(match_meta)
                     db.session.commit()
 
+                    match_meta = MatchMeta(
+                        uuid,
+                        'player_2',
+                        request.json['player_2']
+                    )
+                    db.session.add(match_meta)
+                    db.session.commit()
+
                     message = 'New match setup successfully.'
    
                     return jsonify({

@@ -12,7 +12,7 @@ class MatchMeta(db.Model):
     Extends the SQLAlchemy.Model class.
     """
     id = db.Column(db.Integer, unique=True, primary_key=True)
-    match_id = db.Column(db.String(36), unique=True, nullable=False)
+    match_id = db.Column(db.String(36), unique=False, nullable=False)
     key = db.Column(db.String(), unique=False, nullable=False)
     value = db.Column(db.JSON(), unique=False, nullable=True)
 

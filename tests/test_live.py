@@ -120,19 +120,19 @@ class TestLiveMatch:
 
         p2_metadata = db.session.query(MatchMeta).filter_by(match_id=uuid, key='player_2').one()
 
-        assert 'Player 2' == p1_metadata.name
+        assert 'Player 2' == p2_metadata.value['name']
 
-        assert 3 == p1_metadata.characters[0].id
-        assert 15 == p1_metadata.characters[0].position.x
-        assert 0 == p1_metadata.characters[0].position.y
+        assert 3 == p2_metadata.value['characters'][0]['id']
+        assert 15 == p2_metadata.value['characters'][0]['position']['x']
+        assert 0 == p2_metadata.value['characters'][0]['position']['y']
 
-        assert 4 == p1_metadata.characters[1].id
-        assert 15 == p1_metadata.characters[1].position.x
-        assert 3 == p1_metadata.characters[1].position.y
+        assert 4 == p2_metadata.value['characters'][1]['id']
+        assert 15 == p2_metadata.value['characters'][1]['position']['x']
+        assert 3 == p2_metadata.value['characters'][1]['position']['y']
 
-        assert 5 == p1_metadata.characters[2].id
-        assert 15 == p1_metadata.characters[2].position.x
-        assert 6 == p1_metadata.characters[2].position.y
+        assert 5 == p2_metadata.value['characters'][2]['id']
+        assert 15 == p2_metadata.value['characters'][2]['position']['x']
+        assert 6 == p2_metadata.value['characters'][2]['position']['y']
 
         response = startMatch(
             client,
