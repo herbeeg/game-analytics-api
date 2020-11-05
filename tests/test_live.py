@@ -223,6 +223,9 @@ class TestLiveMatch:
         assert 'Match ended successfully.' in response.json['message']
         assert (f'/match/view/{uuid}') in response.json['match_uri']
 
+        match = db.session.query(Match).filter_by(user_id=1, uuid=uuid, live=0).one()
+        assert 0 == match.live
+
         timing_metadata = db.session.query(MatchMeta).filter_by(match_id=uuid, key='timing').one()
         assert 5 == timing_metadata.value['elapsed_time']
 
