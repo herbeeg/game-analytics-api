@@ -29,6 +29,7 @@ db = SQLAlchemy(app)
 
 from app.models.user import User
 from app.models.match import Match
+from app.models.match_meta import MatchMeta
 
 @jwt.user_claims_loader
 def addClaimsToAccessToken(identity):
@@ -187,10 +188,18 @@ def newMatch():
 
                 match_data = db.session.query(Match).filter_by(user_id=claims['id']).order_by(Match.created_at.desc()).one()
 
-                message = 'New match setup successfully.'
-
                 try:
                     uuid = match_data.uuid
+
+                    match_meta = MatchMeta(
+                        uuid,
+                        'player_1',
+                        request.json['player_1']
+                    )
+                    db.session.add(match_meta)
+                    db.session.commit()
+
+                    message = 'New match setup successfully.'
    
                     return jsonify({
                         'uuid': match_data.uuid,
@@ -198,6 +207,12 @@ def newMatch():
                     }), 200
                 except AttributeError:
                     error = 'Malformed uuid column data.'
+
+                    return jsonify({
+                        'message': error
+                    }), 400
+                except KeyError:
+                    error = 'Malformed match metadata provided.'
 
                     return jsonify({
                         'message': error

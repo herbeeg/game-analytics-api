@@ -2,7 +2,7 @@ import datetime, json, pytest, time
 
 from pathlib import Path
 
-from app.main import app, db, Match
+from app.main import app, db, Match, MatchMeta
 from tests.utils import login, newMatch, register, startMatch
 
 TEST_DB = 'test.db'
