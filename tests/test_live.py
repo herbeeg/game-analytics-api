@@ -3,6 +3,7 @@ import datetime, json, pytest, time
 from pathlib import Path
 
 from app.main import app, db, Match, MatchMeta
+from tests.helpers import getMatchData
 from tests.utils import endMatch, login, newMatch, register, startMatch
 
 TEST_DB = 'test.db'
@@ -39,7 +40,7 @@ class TestLiveMatch:
 
         rv = newMatch(
             client,
-            self.getMatchData(),
+            getMatchData(),
             access_token
         )
 
@@ -56,7 +57,7 @@ class TestLiveMatch:
 
         rv = newMatch(
             client,
-            self.getMatchData(),
+            getMatchData(),
             ''
         )
 
@@ -79,7 +80,7 @@ class TestLiveMatch:
 
         rv = newMatch(
             client,
-            self.getMatchData(),
+            getMatchData(),
             access_token
         )
 
@@ -142,7 +143,7 @@ class TestLiveMatch:
 
         rv = newMatch(
             client,
-            self.getMatchData(),
+            getMatchData(),
             access_token
         )
 
@@ -196,7 +197,7 @@ class TestLiveMatch:
         access_token = json.loads(rv.data)['access_token']
         rv = newMatch(
             client,
-            self.getMatchData(),
+            getMatchData(),
             access_token
         )
 
@@ -237,7 +238,7 @@ class TestLiveMatch:
 
         rv = newMatch(
             client,
-            self.getMatchData(),
+            getMatchData(),
             access_token
         )
 
@@ -291,67 +292,3 @@ class TestLiveMatch:
         assert 401 == response.status_code
         """Cannot end matches that were created by other users."""
         assert 'Cannot end matches owned by other users.' in response.json['message']
-
-    def testViewMatch(self, client):
-        return
-
-    def getMatchData(self):
-        return json.dumps({
-            'title': 'Match 1',
-            'size': {
-                'x': 16,
-                'y': 8
-            },
-            'player_1': {
-                'name': 'Player 1',
-                'characters': [
-                    {
-                        'id': 0,
-                        'position': {
-                            'x': 0,
-                            'y': 0
-                        }
-                    },
-                    {
-                        'id': 1,
-                        'position': {
-                            'x': 0,
-                            'y': 3
-                        }
-                    },
-                    {
-                        'id': 2,
-                        'position': {
-                            'x': 0,
-                            'y': 6
-                        }
-                    }
-                ]
-            },
-            'player_2': {
-                'name': 'Player 2',
-                'characters': [
-                    {
-                        'id': 3,
-                        'position': {
-                            'x': 15,
-                            'y': 0
-                        }
-                    },
-                    {
-                        'id': 4,
-                        'position': {
-                            'x': 15,
-                            'y': 3
-                        }
-                    },
-                    {
-                        'id': 5,
-                        'position': {
-                            'x': 15,
-                            'y': 6
-                        }
-                    }
-                ]
-            }
-        })
