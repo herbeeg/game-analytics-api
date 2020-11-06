@@ -3,8 +3,8 @@ import json, pytest
 from pathlib import Path
 
 from app.main import app, db, Match, MatchMeta
-from tests.helpers import getMatchData
-from tests.utils import login, newMatch, register, startMatch
+from tests.helpers import getMatchData, getTurnData
+from tests.utils import login, newMatch, nextTurn, register, startMatch
 
 TEST_DB = 'test.db'
 
@@ -49,8 +49,8 @@ class TestNextTurn:
         rv = nextTurn(
             client,
             uuid,
-            access_token,
-            getTurnData(0)
+            getTurnData(0),
+            access_token
         )
 
         assert 200 == rv.response_code

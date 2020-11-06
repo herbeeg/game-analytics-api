@@ -60,3 +60,43 @@ def getMatchData():
             ]
         }
     })
+
+def getTurnData(key):
+    data = [
+        {
+            'player_1': {
+                'characters': [
+                    {
+                        'action': '',
+                        'position': ''
+                    },
+                    {
+                        'action': '',
+                        'position': ''
+                    },
+                    {
+                        'action': '',
+                        'position': ''
+                    }
+                ]
+            },
+            'player_2': {
+                'characters': [
+                    {
+                        'action': '',
+                        'position': ''
+                    },
+                    {
+                        'action': '',
+                        'position': ''
+                    },
+                    {
+                        'action': '',
+                        'position': ''
+                    }
+                ]
+            }
+        }
+    ]
+
+    return json.dumps(data[key])

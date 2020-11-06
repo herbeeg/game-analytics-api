@@ -56,3 +56,13 @@ def endMatch(client, uuid, access_token):
         },
         follow_redirects=False
     )
+
+def nextTurn(client, uuid, access_token, data):
+    return client.post(
+        f'/turn/update/{uuid}',
+        data=data,
+        headers={
+            'Authorization': 'Bearer ' + access_token
+        },
+        content_type='application/json'
+    )
