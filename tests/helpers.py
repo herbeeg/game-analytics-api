@@ -67,15 +67,15 @@ def getTurnData(key):
             'player_1': {
                 'characters': [
                     {
-                        'action': '',
+                        'action': 'move',
                         'position': ''
                     },
                     {
-                        'action': '',
+                        'action': 'move',
                         'position': ''
                     },
                     {
-                        'action': '',
+                        'action': 'move',
                         'position': ''
                     }
                 ]
@@ -83,15 +83,15 @@ def getTurnData(key):
             'player_2': {
                 'characters': [
                     {
-                        'action': '',
+                        'action': 'move',
                         'position': ''
                     },
                     {
-                        'action': '',
+                        'action': 'move',
                         'position': ''
                     },
                     {
-                        'action': '',
+                        'action': 'move',
                         'position': ''
                     }
                 ]

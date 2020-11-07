@@ -54,3 +54,14 @@ class TestNextTurn:
         )
 
         assert 200 == rv.response_code
+        assert 'Turn completed.' in json.loads(rv.data)['message']
+
+        turn_meta = db.session.query(MatchMeta).filter_by(match_id=uuid, key='turns').one()
+
+        assert 1 == len(turn_meta)
+        """Metadata from one turn only should have been inserted."""
+
+        assert turn_meta['player_1']
+        assert turn_meta['player_1']['characters'][0]
+
+        assert turn_meta['player_2']
