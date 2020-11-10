@@ -111,3 +111,78 @@ class TestNextTurn:
         assert 'move' in turn_meta['player_2']['characters'][2]['action']
         assert 14 == turn_meta['player_2']['characters'][2]['position']['x']
         assert 6 == turn_meta['player_2']['characters'][2]['position']['y']
+
+    def testUpdateTurnOtherOwners(self, client):
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+
+        access_token = json.loads(rv.data)['access_token']
+        rv = newMatch(
+            client,
+            getMatchData(),
+            access_token
+        )
+
+        uuid = json.loads(rv.data)['uuid']
+
+        rv = nextTurn(
+            client,
+            uuid,
+            getSingleTurnData(),
+            access_token
+        )
+
+        assert 400 == rv.status_code
+        """Match hasn't started yet."""
+        assert 'Cannot update matches that are not in progress.' in json.loads(rv.data)['message']
+
+        response = startMatch(
+            client,
+            uuid,
+            access_token
+        )
+
+        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'])
+        new_rv = login(client, '1' + app.config['EMAIL'], app.config['PASSWORD'])
+
+        new_access_token = json.loads(new_rv.data)['access_token']
+
+        rv = client.post(
+            f'/turn/update/{uuid}',
+            data=getSingleTurnData(),
+            content_type='application/json'
+        )
+
+        assert 401 == rv.status_code
+        """Cannot update matches without authorisation."""
+
+        rv = nextTurn(
+            client,
+            '',
+            getSingleTurnData(),
+            access_token
+        )
+
+        assert 404 == rv.status_code
+        """Cannot update matches that don't exist in the database."""
+
+        rv = nextTurn(
+            client,
+            uuid,
+            getSingleTurnData(),
+            ''
+        )
+
+        assert 422 == rv.status_code
+        """Cannot update matches without a valid access token."""
+
+        rv = nextTurn(
+            client,
+            uuid,
+            getSingleTurnData(),
+            new_access_token
+        )
+
+        assert 401 == rv.status_code
+        """Cannot start matches that were created by other users."""
+        assert 'Cannot update matches owned by other users.' in json.loads(rv.data)['message']
