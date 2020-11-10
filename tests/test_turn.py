@@ -62,7 +62,49 @@ class TestNextTurn:
         """Metadata from one turn only should have been inserted."""
 
         assert turn_meta['player_1']
+        """Player 1 metadata validation."""
+
         assert turn_meta['player_1']['characters'][0]
+        assert 30 == turn_meta['player_1']['characters'][0]['health']['current']
+        assert 30 == turn_meta['player_1']['characters'][0]['health']['max']
+        assert 'move' in turn_meta['player_1']['characters'][0]['action']
+        assert 1 == turn_meta['player_1']['characters'][0]['position']['x']
+        assert 0 == turn_meta['player_1']['characters'][0]['position']['y']
+
+        assert turn_meta['player_1']['characters'][1]
+        assert 20 == turn_meta['player_1']['characters'][1]['health']['current']
+        assert 20 == turn_meta['player_1']['characters'][1]['health']['max']
+        assert 'move' in turn_meta['player_1']['characters'][1]['action']
+        assert 1 == turn_meta['player_1']['characters'][1]['position']['x']
+        assert 3 == turn_meta['player_1']['characters'][1]['position']['y']
+
+        assert turn_meta['player_1']['characters'][2]
+        assert 40 == turn_meta['player_1']['characters'][2]['health']['current']
+        assert 40 == turn_meta['player_1']['characters'][2]['health']['max']
+        assert 'move' in turn_meta['player_1']['characters'][2]['action']
+        assert 1 == turn_meta['player_1']['characters'][2]['position']['x']
+        assert 6 == turn_meta['player_1']['characters'][2]['position']['y']
 
         assert turn_meta['player_2']
+        """Player 2 metadata validation."""
+
         assert turn_meta['player_2']['characters'][0]
+        assert 50 == turn_meta['player_2']['characters'][0]['health']['current']
+        assert 50 == turn_meta['player_2']['characters'][0]['health']['max']
+        assert 'move' in turn_meta['player_2']['characters'][0]['action']
+        assert 14 == turn_meta['player_2']['characters'][0]['position']['x']
+        assert 0 == turn_meta['player_2']['characters'][0]['position']['y']
+
+        assert turn_meta['player_2']['characters'][1]
+        assert 30 == turn_meta['player_2']['characters'][1]['health']['current']
+        assert 30 == turn_meta['player_2']['characters'][1]['health']['max']
+        assert 'move' in turn_meta['player_2']['characters'][1]['action']
+        assert 14 == turn_meta['player_2']['characters'][1]['position']['x']
+        assert 3 == turn_meta['player_2']['characters'][1]['position']['y']
+
+        assert turn_meta['player_2']['characters'][2]
+        assert 20 == turn_meta['player_2']['characters'][2]['health']['current']
+        assert 20 == turn_meta['player_2']['characters'][2]['health']['max']
+        assert 'move' in turn_meta['player_2']['characters'][2]['action']
+        assert 14 == turn_meta['player_2']['characters'][2]['position']['x']
+        assert 6 == turn_meta['player_2']['characters'][2]['position']['y']

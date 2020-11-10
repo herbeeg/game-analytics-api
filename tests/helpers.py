@@ -67,6 +67,7 @@ def getTurnData(key):
             'player_1': {
                 'characters': [
                     {
+                        'id': 0,
                         'health': {
                             'current': 30,
                             'max': 30
@@ -78,6 +79,7 @@ def getTurnData(key):
                         }
                     },
                     {
+                        'id': 1,
                         'health': {
                             'current': 20,
                             'max': 20
@@ -89,6 +91,7 @@ def getTurnData(key):
                         }
                     },
                     {
+                        'id': 2,
                         'health': {
                             'current': 40,
                             'max': 40
@@ -104,6 +107,7 @@ def getTurnData(key):
             'player_2': {
                 'characters': [
                     {
+                        'id': 3,
                         'health': {
                             'current': 50,
                             'max': 50
@@ -115,6 +119,7 @@ def getTurnData(key):
                         }
                     },
                     {
+                        'id': 4,
                         'health': {
                             'current': 30,
                             'max': 30
@@ -126,6 +131,7 @@ def getTurnData(key):
                         }
                     },
                     {
+                        'id': 5,
                         'health': {
                             'current': 20,
                             'max': 20
