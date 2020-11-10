@@ -20,6 +20,7 @@ class TestLiveMatchViewing:
         app.config['EMAIL'] = 'admin@test.com'
         app.config['USERNAME'] = 'admin'
         app.config['PASSWORD'] = 'password'
+        app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
 
         db.create_all()
 

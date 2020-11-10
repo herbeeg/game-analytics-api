@@ -1,9 +1,14 @@
 import json
 
-def register(client, email, username, password):
+def register(client, email, username, password, activation_key):
     return client.post(
         '/register',
-        data=json.dumps({'email': email, 'username': username, 'password': password}),
+        data=json.dumps({
+            'email': email,
+            'username': username,
+            'password': password,
+            'activation_key': activation_key
+        }),
         content_type='application/json'
     )
 

@@ -19,6 +19,7 @@ class TestDashboardHomeView:
         app.config['EMAIL'] = 'admin@test.com'
         app.config['USERNAME'] = 'admin'
         app.config['PASSWORD'] = 'password'
+        app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
 
         db.create_all()
 
@@ -28,7 +29,7 @@ class TestDashboardHomeView:
         db.drop_all()
 
     def testHome(self, client):
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
         rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
 
         response = client.get(

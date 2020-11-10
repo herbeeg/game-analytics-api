@@ -20,6 +20,7 @@ class TestNextTurn:
         app.config['EMAIL'] = 'admin@test.com'
         app.config['USERNAME'] = 'admin'
         app.config['PASSWORD'] = 'password'
+        app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
 
         db.create_all()
 
@@ -29,7 +30,7 @@ class TestNextTurn:
         db.drop_all()
 
     def testUpdateTurn(self, client):
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
         rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
 
         access_token = json.loads(rv.data)['access_token']
@@ -113,7 +114,7 @@ class TestNextTurn:
         assert 6 == turn_meta['player_2']['characters'][2]['position']['y']
 
     def testUpdateTurnOtherOwners(self, client):
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
         rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
 
         access_token = json.loads(rv.data)['access_token']
@@ -142,7 +143,7 @@ class TestNextTurn:
             access_token
         )
 
-        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'])
+        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
         new_rv = login(client, '1' + app.config['EMAIL'], app.config['PASSWORD'])
 
         new_access_token = json.loads(new_rv.data)['access_token']

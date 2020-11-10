@@ -19,6 +19,7 @@ class TestMainCase:
         app.config['EMAIL'] = 'admin@test.com'
         app.config['USERNAME'] = 'admin'
         app.config['PASSWORD'] = 'password'
+        app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
 
         db.create_all()
 
@@ -41,7 +42,7 @@ class TestMainCase:
         """Update app config email to allow checks against existing database rows."""
         app.config['USERNAME'] = 'newuser'
 
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
         assert 'Registration successful.' in json.loads(rv.data)['message']
         
         users = db.session.query(User).filter_by(email=app.config['EMAIL']).all()
@@ -56,16 +57,26 @@ class TestMainCase:
         assert 200 == rv.status_code
         assert 'Logout successful.' in json.loads(rv.data)['message']
 
-        rv = register(client, 'j' + app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = register(client, 'j' + app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
         assert 400 == rv.status_code
         assert 'A user with that name already exists.' in json.loads(rv.data)['message']
 
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'] + '1', app.config['PASSWORD'])
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'] + '1', app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
         assert 400 == rv.status_code
         assert 'A user with that email already exists.' in json.loads(rv.data)['message']
 
+        rv = register(client, 'act' + app.config['EMAIL'], 'act' + app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
+        """Already used activation key testing."""
+        assert 400 == rv.status_code
+        assert 'That activation key has already been used.' in json.loads(rv.data)['message']
+
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'] + '1')
+        """Invalid activation key testing."""
+        assert 400 == rv.status_code
+        assert 'An activation key with that value does not exist.' in json.loads(rv.data)['message']
+
     def testLoginLogout(self, client):
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'])
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
         assert 200 == rv.status_code
 
         rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
