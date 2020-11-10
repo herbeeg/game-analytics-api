@@ -366,6 +366,9 @@ def nextTurn(uuid):
                         request.json
                     )
                 
+                db.session.add(match_meta)
+                db.session.commit()
+
                 message = 'Turn completed.'
 
                 return jsonify({

@@ -3,7 +3,7 @@ import json, pytest
 from pathlib import Path
 
 from app.main import app, db, Match, MatchMeta
-from tests.helpers import getMatchData, getTurnData
+from tests.helpers import getMatchData, getSingleTurnData
 from tests.utils import login, newMatch, nextTurn, register, startMatch
 
 TEST_DB = 'test.db'
@@ -49,7 +49,7 @@ class TestNextTurn:
         rv = nextTurn(
             client,
             uuid,
-            getTurnData(0),
+            getSingleTurnData(),
             access_token
         )
 
@@ -58,8 +58,11 @@ class TestNextTurn:
 
         turn_meta = db.session.query(MatchMeta).filter_by(match_id=uuid, key='turns').one()
 
-        assert 1 == len(turn_meta)
+        assert 1 == len(turn_meta.value['turns'])
         """Metadata from one turn only should have been inserted."""
+
+        turn_meta = turn_meta.value['turns'][0]
+        """Get first and only item of turn metadata for shorter references."""
 
         assert turn_meta['player_1']
         """Player 1 metadata validation."""

@@ -61,90 +61,92 @@ def getMatchData():
         }
     })
 
-def getTurnData(key):
-    data = [
-        {
-            'player_1': {
-                'characters': [
-                    {
-                        'id': 0,
-                        'health': {
-                            'current': 30,
-                            'max': 30
+def getSingleTurnData():
+    data = {
+        'turns': [
+            {
+                'player_1': {
+                    'characters': [
+                        {
+                            'id': 0,
+                            'health': {
+                                'current': 30,
+                                'max': 30
+                            },
+                            'action': 'move',
+                            'position': {
+                                'x': 1,
+                                'y': 0
+                            }
                         },
-                        'action': 'move',
-                        'position': {
-                            'x': 1,
-                            'y': 0
-                        }
-                    },
-                    {
-                        'id': 1,
-                        'health': {
-                            'current': 20,
-                            'max': 20
+                        {
+                            'id': 1,
+                            'health': {
+                                'current': 20,
+                                'max': 20
+                            },
+                            'action': 'move',
+                            'position': {
+                                'x': 1,
+                                'y': 3
+                            }
                         },
-                        'action': 'move',
-                        'position': {
-                            'x': 1,
-                            'y': 3
+                        {
+                            'id': 2,
+                            'health': {
+                                'current': 40,
+                                'max': 40
+                            },
+                            'action': 'move',
+                            'position': {
+                                'x': 1,
+                                'y': 6
+                            }
                         }
-                    },
-                    {
-                        'id': 2,
-                        'health': {
-                            'current': 40,
-                            'max': 40
+                    ]
+                },
+                'player_2': {
+                    'characters': [
+                        {
+                            'id': 3,
+                            'health': {
+                                'current': 50,
+                                'max': 50
+                            },
+                            'action': 'move',
+                            'position': {
+                                'x': 14,
+                                'y': 0
+                            }
                         },
-                        'action': 'move',
-                        'position': {
-                            'x': 1,
-                            'y': 6
-                        }
-                    }
-                ]
-            },
-            'player_2': {
-                'characters': [
-                    {
-                        'id': 3,
-                        'health': {
-                            'current': 50,
-                            'max': 50
+                        {
+                            'id': 4,
+                            'health': {
+                                'current': 30,
+                                'max': 30
+                            },
+                            'action': 'move',
+                            'position': {
+                                'x': 14,
+                                'y': 3
+                            }
                         },
-                        'action': 'move',
-                        'position': {
-                            'x': 14,
-                            'y': 0
+                        {
+                            'id': 5,
+                            'health': {
+                                'current': 20,
+                                'max': 20
+                            },
+                            'action': 'move',
+                            'position': {
+                                'x': 14,
+                                'y': 6
+                            }
                         }
-                    },
-                    {
-                        'id': 4,
-                        'health': {
-                            'current': 30,
-                            'max': 30
-                        },
-                        'action': 'move',
-                        'position': {
-                            'x': 14,
-                            'y': 3
-                        }
-                    },
-                    {
-                        'id': 5,
-                        'health': {
-                            'current': 20,
-                            'max': 20
-                        },
-                        'action': 'move',
-                        'position': {
-                            'x': 14,
-                            'y': 6
-                        }
-                    }
-                ]
+                    ]
+                }
             }
-        }
-    ]
+        ]
+    }
 
-    return json.dumps(data[key])
+    return json.dumps(data)
