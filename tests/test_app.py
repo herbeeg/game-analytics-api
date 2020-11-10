@@ -2,7 +2,7 @@ import datetime, json, pytest
 
 from pathlib import Path
 
-from app.main import app, db, User
+from app.main import app, db, Activation, User
 from tests.utils import login, logout, register
 
 TEST_DB = 'test.db'
@@ -22,6 +22,11 @@ class TestMainCase:
         app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
 
         db.create_all()
+
+        new_key = Activation(app.config['ACTIVATION_KEY'])
+        """Use a fixed activation key string for testing purposes."""
+        db.session.add(new_key)
+        db.session.commit()
 
         with app.test_client(self) as client:
             yield client
@@ -44,6 +49,13 @@ class TestMainCase:
 
         rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
         assert 'Registration successful.' in json.loads(rv.data)['message']
+
+        activation = db.session.query(Activation).filter_by(claimed=1, user_id=1).one()
+        """Test redeeming of stored activation keys."""
+        assert 1 == activation.id
+        assert 1 == activation.user_id
+        assert '08fe47e8814b410cbaf742463e8c9252' == activation.key
+        assert 1 == activation.claimed
         
         users = db.session.query(User).filter_by(email=app.config['EMAIL']).all()
         assert datetime.datetime.now().strftime('%Y-%m-%d') == users[0].created_at.strftime('%Y-%m-%d')
@@ -70,7 +82,7 @@ class TestMainCase:
         assert 400 == rv.status_code
         assert 'That activation key has already been used.' in json.loads(rv.data)['message']
 
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'] + '1')
+        rv = register(client, 'act' + app.config['EMAIL'], 'act' + app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'] + '1')
         """Invalid activation key testing."""
         assert 400 == rv.status_code
         assert 'An activation key with that value does not exist.' in json.loads(rv.data)['message']

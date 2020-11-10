@@ -2,7 +2,7 @@ import datetime, json, pytest
 
 from pathlib import Path
 
-from app.main import app, db
+from app.main import app, db, Activation
 from tests.utils import login, logout, profile, register
 
 TEST_DB = 'test.db'
@@ -22,6 +22,11 @@ class TestProtectedProfile:
         app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
 
         db.create_all()
+
+        new_key = Activation(app.config['ACTIVATION_KEY'])
+        """Use a fixed activation key string for testing purposes."""
+        db.session.add(new_key)
+        db.session.commit()
 
         with app.test_client(self) as client:
             yield client

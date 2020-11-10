@@ -27,9 +27,10 @@ jwt = JWTManager(app)
 
 db = SQLAlchemy(app)
 
-from app.models.user import User
+from app.models.activation import Activation
 from app.models.match import Match
 from app.models.match_meta import MatchMeta
+from app.models.user import User
 
 @jwt.user_claims_loader
 def addClaimsToAccessToken(identity):
@@ -56,11 +57,16 @@ def register():
     if 'POST' == request.method:
         emails = db.session.query(User).filter_by(email=request.json['email']).all()
         usernames = db.session.query(User).filter_by(username=request.json['username']).all()
+        activation_keys = db.session.query(Activation).filter_by(key=request.json['activation_key']).first()
 
         if emails:
             error = 'A user with that email already exists.'
         elif usernames:
             error = 'A user with that name already exists.'
+        elif not activation_keys:
+            error = 'An activation key with that value does not exist.'
+        elif 1 == activation_keys.claimed:
+            error = 'That activation key has already been used.'
         else:
             new_user = User(
                 request.json['email'], 
@@ -69,6 +75,10 @@ def register():
                 datetime.datetime.utcnow()
             )
             db.session.add(new_user)
+            db.session.commit()
+
+            activation_keys.claimed = 1
+            activation_keys.user_id = db.session.query(User).filter_by(username=request.json['username']).first().id
             db.session.commit()
 
             message = 'Registration successful.'
