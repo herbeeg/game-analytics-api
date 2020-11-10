@@ -332,5 +332,49 @@ def endMatch(uuid):
         'message': error
     }), 400
 
+@app.route('/turn/update/<uuid>', methods=['POST'])
+@jwt_required
+def nextTurn(uuid):
+    claims = get_jwt_claims()
+    username = get_jwt_identity()
+
+    error = None
+
+    if 'POST' == request.method:
+        if not username:
+            error = 'Invalid username identity.'
+        else:
+            match = db.session.query(Match).filter_by(uuid=uuid).first()
+
+            if not match:
+                return 404
+            elif 0 == match.live:
+                error = 'Cannot update matches that are not in progress.'
+            elif match.user_id != claims['id']:
+                error = 'Cannot update matches owned by other users.'
+
+                return jsonify({
+                    'message': error
+                }), 401
+            else:
+                turn_meta = db.session.query(MatchMeta).filter_by(match_id=uuid, key='turns').first()
+
+                if not turn_meta:
+                    match_meta = MatchMeta(
+                        uuid,
+                        'turns',
+                        request.json
+                    )
+                
+                message = 'Turn completed.'
+
+                return jsonify({
+                    'message': message
+                }), 200
+
+    return jsonify({
+        'message': error
+    }), 400
+
 if '__main__' == __name__:
     app.run(port=5000)

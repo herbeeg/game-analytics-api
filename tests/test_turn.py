@@ -53,7 +53,7 @@ class TestNextTurn:
             access_token
         )
 
-        assert 200 == rv.response_code
+        assert 200 == rv.status_code
         assert 'Turn completed.' in json.loads(rv.data)['message']
 
         turn_meta = db.session.query(MatchMeta).filter_by(match_id=uuid, key='turns').one()

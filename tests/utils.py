@@ -57,7 +57,7 @@ def endMatch(client, uuid, access_token):
         follow_redirects=False
     )
 
-def nextTurn(client, uuid, access_token, data):
+def nextTurn(client, uuid, data, access_token):
     return client.post(
         f'/turn/update/{uuid}',
         data=data,
