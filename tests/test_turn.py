@@ -65,3 +65,4 @@ class TestNextTurn:
         assert turn_meta['player_1']['characters'][0]
 
         assert turn_meta['player_2']
+        assert turn_meta['player_2']['characters'][0]
