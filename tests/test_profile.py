@@ -20,12 +20,15 @@ class TestProtectedProfile:
         app.config['USERNAME'] = 'admin'
         app.config['PASSWORD'] = 'password'
         app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
+        app.config['ACTIVATION_KEY_2'] = '97a56754b27e4cbea94e6c7ca9884b2b'
 
         db.create_all()
 
-        new_key = Activation(app.config['ACTIVATION_KEY'])
-        """Use a fixed activation key string for testing purposes."""
-        db.session.add(new_key)
+        key_first = Activation(app.config['ACTIVATION_KEY'])
+        key_second = Activation(app.config['ACTIVATION_KEY_2'])
+        """Use fixed activation key strings for testing purposes."""
+        db.session.add(key_first)
+        db.session.add(key_second)
         db.session.commit()
 
         with app.test_client(self) as client:
@@ -58,7 +61,7 @@ class TestProtectedProfile:
         assert 400 == response.status_code
         assert 'User does not exist.' in response.json['message']
 
-        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
+        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY_2'])
         new_rv = login(client, '1' + app.config['EMAIL'], app.config['PASSWORD'])
 
         response = profile(client, 2, json.loads(new_rv.data)['access_token'])
