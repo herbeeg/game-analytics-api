@@ -397,6 +397,7 @@ def viewTurn(uuid, turn_number):
 
     error = None
 
+    turn_number = int(turn_number) - 1
     match = db.session.query(Match).filter_by(uuid=uuid).first()
 
     if not match:
@@ -414,14 +415,15 @@ def viewTurn(uuid, turn_number):
             error = 'Match does not have any turns completed.'
         else:
             try:
-                turn_meta = turn_meta.value['turns'][(turn_number-1)]
+                turn_meta = turn_meta.value['turns'][turn_number]
 
                 message = 'Turn data retrieved successfully.'
 
                 return jsonify({
+                    'data': turn_meta,
                     'message': message
                 })
-            except KeyError:
+            except IndexError:
                 error = 'Invalid turn number provided.'
 
     return jsonify({

@@ -219,6 +219,14 @@ class TestLiveMatchViewing:
         assert 404 == response.status_code
         """Cannot view matches that don't exist in the database."""
 
+        response = client.get(
+            f'/turn/view/{uuid}/1',
+            follow_redirects=False
+        )
+
+        assert 401 == response.status_code
+        """Test malformed GET request."""
+
         response = viewTurn(
             client,
             uuid,
@@ -226,7 +234,7 @@ class TestLiveMatchViewing:
             ''
         )
 
-        assert 401 == response.status_code
+        assert 422 == response.status_code
         """Cannot view matches without a valid access token."""
 
         response = viewTurn(
@@ -243,7 +251,7 @@ class TestLiveMatchViewing:
         response = viewTurn(
             client,
             uuid,
-            0,
+            2,
             access_token
         )
 
