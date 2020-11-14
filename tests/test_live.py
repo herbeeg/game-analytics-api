@@ -167,3 +167,85 @@ class TestLiveMatchViewing:
                     same = False
 
         assert True == same
+
+    def testViewSingleTurnOtherOwners(self, client):
+        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
+        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+
+        access_token = json.loads(rv.data)['access_token']
+        rv = newMatch(
+            client,
+            getMatchData(),
+            access_token
+        )
+
+        uuid = json.loads(rv.data)['uuid']
+        response = startMatch(
+            client,
+            uuid,
+            access_token
+        )
+
+        response = viewTurn(
+            client,
+            uuid,
+            1,
+            access_token
+        )
+
+        assert 400 == response.status_code
+        """Match hasn't completed any turns yet."""
+        assert 'Match does not have any turns completed.' in json.loads(rv.data)['message']
+
+        rv = nextTurn(
+            client,
+            uuid,
+            getSingleTurnData(),
+            access_token
+        )
+
+        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY_2'])
+        new_rv = login(client, '1' + app.config['EMAIL'], app.config['PASSWORD'])
+
+        new_access_token = json.loads(new_rv.data)['access_token']
+
+        response = viewTurn(
+            client,
+            '',
+            1,
+            access_token
+        )
+
+        assert 404 == response.status_code
+        """Cannot view matches that don't exist in the database."""
+
+        response = viewTurn(
+            client,
+            uuid,
+            1,
+            ''
+        )
+
+        assert 422 == response.status_code
+        """Cannot view matches without a valid access token."""
+
+        response = viewTurn(
+            client,
+            uuid,
+            1,
+            new_access_token
+        )
+
+        assert 401 == response.status_code
+        """Cannot view matches that were created by other users."""
+        assert 'Cannot view matches owned by other users.' in response.json['message']
+
+        response = viewTurn(
+            client,
+            uuid,
+            0,
+            access_token
+        )
+
+        assert 400 == response.status_code
+        assert 'Invalid turn number provided.' in response.json['message']
