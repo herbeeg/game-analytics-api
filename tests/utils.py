@@ -71,3 +71,12 @@ def nextTurn(client, uuid, data, access_token):
         },
         content_type='application/json'
     )
+
+def viewTurn(client, uuid, turn_number, access_token):
+    return client.get(
+        f'/turn/view/{uuid}/{turn_number}',
+        headers={
+            'Authorization': 'Bearer ' + access_token
+        },
+        follow_redirects=False
+    )

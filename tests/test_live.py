@@ -4,7 +4,7 @@ from pathlib import Path
 
 from app.main import app, db, Activation, Match, MatchMeta
 from tests.helpers import getMatchData, getProjectedMatrix, getSingleTurnData
-from tests.utils import login, newMatch, nextTurn, register, startMatch
+from tests.utils import login, newMatch, nextTurn, register, startMatch, viewTurn
 
 TEST_DB = 'test.db'
 
