@@ -389,5 +389,44 @@ def nextTurn(uuid):
         'message': error
     }), 400
 
+@app.route('/turn/view/<uuid>/<turn_number>', methods=['GET'])
+@jwt_required
+def viewTurn(uuid, turn_number):
+    claims = get_jwt_claims()
+    username = get_jwt_identity()
+
+    error = None
+
+    match = db.session.query(Match).filter_by(uuid=uuid).first()
+
+    if not match:
+        return 404
+    elif match.user_id != claims['id']:
+        error = 'Cannot view matches owned by other users.'
+
+        return jsonify({
+            'message': error
+        }), 401
+    else:
+        turn_meta = db.session.query(MatchMeta).filter_by(match_id=uuid, key='turns').first()
+
+        if not turn_meta:
+            error = 'Match does not have any turns completed.'
+        else:
+            try:
+                turn_meta = turn_meta.value['turns'][(turn_number-1)]
+
+                message = 'Turn data retrieved successfully.'
+
+                return jsonify({
+                    'message': message
+                })
+            except KeyError:
+                error = 'Invalid turn number provided.'
+
+    return jsonify({
+        'message': error
+    }), 400
+
 if '__main__' == __name__:
     app.run(port=5000)

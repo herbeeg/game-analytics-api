@@ -195,7 +195,7 @@ class TestLiveMatchViewing:
 
         assert 400 == response.status_code
         """Match hasn't completed any turns yet."""
-        assert 'Match does not have any turns completed.' in json.loads(rv.data)['message']
+        assert 'Match does not have any turns completed.' in response.json['message']
 
         rv = nextTurn(
             client,
@@ -226,7 +226,7 @@ class TestLiveMatchViewing:
             ''
         )
 
-        assert 422 == response.status_code
+        assert 401 == response.status_code
         """Cannot view matches without a valid access token."""
 
         response = viewTurn(
