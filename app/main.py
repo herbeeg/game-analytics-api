@@ -1,4 +1,4 @@
-import datetime, os, sqlite3
+import datetime, json, os, sqlite3
 
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, jsonify, request
@@ -26,6 +26,8 @@ jwt = JWTManager(app)
 """Setup the Flask-JWT-Extended extension."""
 
 db = SQLAlchemy(app)
+
+from app.matrix.generator import MatrixGenerator
 
 from app.models.activation import Activation
 from app.models.match import Match
@@ -419,8 +421,15 @@ def viewTurn(uuid, turn_number):
 
                 message = 'Turn data retrieved successfully.'
 
+                positions = []
+                for c in turn_meta:
+                    positions.append(c)
+
+                matrix = MatrixGenerator([]).generate()
+
                 return jsonify({
                     'data': turn_meta,
+                    'matrix': matrix,
                     'message': message
                 })
             except IndexError:

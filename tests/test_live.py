@@ -153,7 +153,7 @@ class TestLiveMatchViewing:
             access_token
         )
 
-        assert response.json['data']['matrix']
+        assert response.json['matrix']
 
         matrix = getProjectedMatrix()
         same = True
@@ -161,7 +161,7 @@ class TestLiveMatchViewing:
 
         for i in range(8):
             """Default battleground size is 16x8 tiles."""
-            for actual, provided in zip(response.json['data']['matrix'][i], matrix[i]):
+            for actual, provided in zip(response.json['matrix'][i], matrix[i]):
                 """Use simple looping of list items to make direct comparisons on each value."""
                 if actual != provided:
                     same = False
