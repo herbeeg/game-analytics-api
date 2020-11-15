@@ -1,9 +1,8 @@
-import datetime, json, pytest
+import pytest
 
 from pathlib import Path
 
 from app.main import app, db, Activation, User
-from tests.utils import login, logout, register
 
 TEST_DB = 'test.db'
 
@@ -24,4 +23,4 @@ class TestMainCase:
         db.drop_all()
 
     def testActivationKeyGeneration(self, client):
-        return
+        assert True == False
