@@ -11,6 +11,6 @@ class MatrixGenerator:
         for pos in self.positions:
             matrix[pos['y']][pos['x']] = pos['id']
 
-        filled_matrix = [[k if k else 't' for k in i] for i in matrix]
+        filled_matrix = [[str(k) if '' != k else 't' for k in i] for i in matrix]
 
         return filled_matrix

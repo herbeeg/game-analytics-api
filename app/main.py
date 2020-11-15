@@ -28,6 +28,7 @@ jwt = JWTManager(app)
 db = SQLAlchemy(app)
 
 from app.matrix.generator import MatrixGenerator
+from app.matrix.position import TurnPositions
 
 from app.models.activation import Activation
 from app.models.match import Match
@@ -421,11 +422,16 @@ def viewTurn(uuid, turn_number):
 
                 message = 'Turn data retrieved successfully.'
 
-                positions = []
-                for c in turn_meta:
-                    positions.append(c)
+                positions = TurnPositions(turn_meta).parse()
 
-                matrix = MatrixGenerator([]).generate()
+                if str == type(positions):
+                    error = positions
+
+                    return jsonify({
+                        'message': error
+                    })
+                
+                matrix = MatrixGenerator(positions).generate()
 
                 return jsonify({
                     'data': turn_meta,
