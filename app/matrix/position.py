@@ -1,8 +1,26 @@
 class TurnPositions:
+    """
+    Convert turn metadata stored in the database
+    to a list of character positions that can 
+    be turned into a positional matrix
+    returned to the API requester.
+    """
     def __init__(self, meta):
+        """
+        Store metadata.
+
+        Args:
+            meta (list): Metadata returned from the database
+        """
         self.meta = meta
 
     def parse(self):
+        """
+        Extract positional data from the turn meta.
+
+        Returns:
+            list: List of positional key values
+        """
         positions = []
         players = [
             'player_1',

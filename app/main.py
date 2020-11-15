@@ -420,8 +420,6 @@ def viewTurn(uuid, turn_number):
             try:
                 turn_meta = turn_meta.value['turns'][turn_number]
 
-                message = 'Turn data retrieved successfully.'
-
                 positions = TurnPositions(turn_meta).parse()
 
                 if str == type(positions):
@@ -432,6 +430,8 @@ def viewTurn(uuid, turn_number):
                     })
                 
                 matrix = MatrixGenerator(positions).generate()
+
+                message = 'Turn data retrieved successfully.'
 
                 return jsonify({
                     'data': turn_meta,
