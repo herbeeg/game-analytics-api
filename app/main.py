@@ -445,5 +445,18 @@ def viewTurn(uuid, turn_number):
         'message': error
     }), 400
 
+@app.cli.command('generate-activation-key')
+def generate_single_activation_key():
+    key = ''.join(str(uuid.uuid4()).split('-'))
+
+    try:
+        activation_key = Activation(key)
+        db.session.add(activation_key)
+        db.session.commit()
+
+        print(key)
+    except Exception:
+        print('Random activation key could not be generated.')
+
 if '__main__' == __name__:
     app.run(port=5000)
