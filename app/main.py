@@ -1,4 +1,4 @@
-import datetime, json, os, sqlite3
+import click, datetime, json, os, sqlite3, uuid
 
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, jsonify, request
@@ -454,9 +454,9 @@ def generate_single_activation_key():
         db.session.add(activation_key)
         db.session.commit()
 
-        print(key)
+        click.echo(key, nl=False)
     except Exception:
-        print('Random activation key could not be generated.')
+        click.echo('Random activation key could not be generated.', nl=False)
 
 if '__main__' == __name__:
     app.run(port=5000)

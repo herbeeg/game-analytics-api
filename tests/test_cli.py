@@ -23,4 +23,9 @@ class TestMainCase:
         db.drop_all()
 
     def testActivationKeyGeneration(self, client):
-        assert True == False
+        runner = app.test_cli_runner()
+        result = runner.invoke(args=['generate-activation-key'])
+
+        activation = db.session.query(Activation).filter_by(id=1).first()
+
+        assert result.output == activation.key
