@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify
 
 user_logout = Blueprint('user_logout', __name__)
 
