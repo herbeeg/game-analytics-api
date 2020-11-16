@@ -14,32 +14,32 @@ class TestDashboardHomeView:
     def client(self):
         BASE_DIR = Path(__file__).resolve().parent.parent
 
-        app = create_app()
+        self.app = create_app()
 
-        app.config['TESTING'] = True
-        app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR.joinpath(TEST_DB)}'
+        self.app.config['TESTING'] = True
+        self.app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR.joinpath(TEST_DB)}'
 
-        app.config['EMAIL'] = 'admin@test.com'
-        app.config['USERNAME'] = 'admin'
-        app.config['PASSWORD'] = 'password'
-        app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
+        self.app.config['EMAIL'] = 'admin@test.com'
+        self.app.config['USERNAME'] = 'admin'
+        self.app.config['PASSWORD'] = 'password'
+        self.app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
 
         db.create_all()
 
-        new_key = Activation(app.config['ACTIVATION_KEY'])
+        new_key = Activation(self.app.config['ACTIVATION_KEY'])
         """Use a fixed activation key string for testing purposes."""
         db.session.add(new_key)
         db.session.commit()
 
-        with app.test_client(self) as client:
+        with self.app.test_client(self) as client:
             yield client
 
         db.drop_all()
 
     def testHome(self, client):
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
-        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+        rv = register(client, self.app.config['EMAIL'], self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY'])
+        rv = login(client, self.app.config['EMAIL'], self.app.config['PASSWORD'])
 
         response = client.get(
             '/dashboard',

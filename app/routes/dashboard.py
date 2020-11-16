@@ -1,5 +1,5 @@
-from flask import Blueprint
-from flask_jwt_extended import jwt_required
+from flask import Blueprint, jsonify
+from flask_jwt_extended import get_jwt_identity, get_jwt_claims, jwt_required
 
 home = Blueprint('home', __name__)
 
