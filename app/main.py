@@ -1,5 +1,7 @@
 import click, datetime, json, os, sqlite3, uuid
 
+from app.routes.index import overview
+
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt_claims
@@ -35,6 +37,8 @@ from app.models.match import Match
 from app.models.match_meta import MatchMeta
 from app.models.user import User
 
+app.register_blueprint(overview)
+
 @jwt.user_claims_loader
 def addClaimsToAccessToken(identity):
     users = db.session.query(User).filter_by(username=identity).all()
@@ -43,10 +47,6 @@ def addClaimsToAccessToken(identity):
         'username': identity,
         'id': users[0].id
     }
-
-@app.route('/')
-def index():
-    return 'There is no ignorance, there is knowledge.'
 
 @app.route('/register', methods=['POST'])
 def register():
