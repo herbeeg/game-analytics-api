@@ -1,7 +1,5 @@
 import click, datetime, json, os, sqlite3, uuid
 
-from app.routes.index import overview
-
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt_claims
@@ -37,7 +35,11 @@ from app.models.match import Match
 from app.models.match_meta import MatchMeta
 from app.models.user import User
 
+from app.routes.index import overview
+from app.routes.register import registration
+
 app.register_blueprint(overview)
+app.register_blueprint(registration)
 
 @jwt.user_claims_loader
 def addClaimsToAccessToken(identity):
@@ -47,51 +49,6 @@ def addClaimsToAccessToken(identity):
         'username': identity,
         'id': users[0].id
     }
-
-@app.route('/register', methods=['POST'])
-def register():
-    """
-    Allow users to register themselves for
-    the service using a unique email
-    address and password.
-    """
-    error = None
-
-    if 'POST' == request.method:
-        emails = db.session.query(User).filter_by(email=request.json['email']).all()
-        usernames = db.session.query(User).filter_by(username=request.json['username']).all()
-        activation_keys = db.session.query(Activation).filter_by(key=request.json['activation_key']).first()
-
-        if emails:
-            error = 'A user with that email already exists.'
-        elif usernames:
-            error = 'A user with that name already exists.'
-        elif not activation_keys:
-            error = 'An activation key with that value does not exist.'
-        elif 1 == activation_keys.claimed:
-            error = 'That activation key has already been used.'
-        else:
-            new_user = User(
-                request.json['email'], 
-                request.json['username'], 
-                generate_password_hash(request.json['password']), 
-                datetime.datetime.utcnow()
-            )
-            db.session.add(new_user)
-            db.session.commit()
-
-            activation_keys.claimed = 1
-            activation_keys.user_id = db.session.query(User).filter_by(username=request.json['username']).first().id
-            db.session.commit()
-
-            message = 'Registration successful.'
-
-            return jsonify({
-                'message': message
-            }), 200
-        return jsonify({
-            'message': error
-        }), 400
 
 @app.route('/login', methods=['POST'])
 def login():
