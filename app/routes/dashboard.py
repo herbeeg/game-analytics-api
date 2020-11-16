@@ -1,9 +1,9 @@
 from flask import Blueprint
 from flask_jwt_extended import jwt_required
 
-dashboard = Blueprint('dashboard', __name__)
+home = Blueprint('home', __name__)
 
-@dashboard.route('/dashboard', methods=['GET'])
+@home.route('/dashboard', methods=['GET'])
 @jwt_required
 def dashboard():
     claims = get_jwt_claims()

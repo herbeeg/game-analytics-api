@@ -1,8 +1,13 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import create_access_token
+from werkzeug.security import check_password_hash
 
-login = Blueprint('login', __name__)
+from app.database import db
+from app.models.user import User
 
-@login.route('/login', methods=['POST'])
+user_login = Blueprint('user_login', __name__)
+
+@user_login.route('/login', methods=['POST'])
 def login():
     """
     Manage user login authentication via

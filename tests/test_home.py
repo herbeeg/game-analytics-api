@@ -2,7 +2,9 @@ import datetime, json, pytest
 
 from pathlib import Path
 
-from app.main import app, db, Activation
+from app.models.activation import Activation
+from app.main import create_app
+from app.database import db
 from tests.utils import login, logout, register
 
 TEST_DB = 'test.db'
@@ -11,6 +13,8 @@ class TestDashboardHomeView:
     @pytest.fixture
     def client(self):
         BASE_DIR = Path(__file__).resolve().parent.parent
+
+        app = create_app()
 
         app.config['TESTING'] = True
         app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)

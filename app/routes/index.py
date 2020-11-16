@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-overview = Blueprint('index', __name__)
+overview = Blueprint('overview', __name__)
 
 @overview.route('/')
 def index():

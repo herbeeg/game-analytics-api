@@ -2,7 +2,10 @@ import pytest
 
 from pathlib import Path
 
-from app.main import app, db, Activation, User
+from app.models.activation import Activation
+from app.models.user import User
+from app.main import create_app
+from app.database import db
 
 TEST_DB = 'test.db'
 
@@ -10,6 +13,8 @@ class TestMainCase:
     @pytest.fixture
     def client(self):
         BASE_DIR = Path(__file__).resolve().parent.parent
+
+        app = create_app()
 
         app.config['TESTING'] = True
         app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)

@@ -1,12 +1,14 @@
 import datetime, json, os, sqlite3, uuid
 
+from app.routes.jwt import claims
 from app.routes.index import overview
 from app.routes.register import registration
-from app.routes.login import login
-from app.routes.logout import logout
-from app.routes.dashboard import dashboard
+from app.routes.login import user_login
+from app.routes.logout import user_logout
+from app.routes.dashboard import home
 from app.routes.match import match
 from app.database import db
+from app.jwt import jwt
 
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, jsonify, request
@@ -39,18 +41,14 @@ def create_app():
     app.config.from_object(__name__)
 
     db.init_app(app)
+    jwt.init_app(app)
 
-    jwt = JWTManager(app)
-    """Setup the Flask-JWT-Extended extension."""
-
-    from app.routes.jwt import claims
     app.register_blueprint(claims)
-
     app.register_blueprint(overview)
     app.register_blueprint(registration)
-    app.register_blueprint(login)
-    app.register_blueprint(logout)
-    app.register_blueprint(dashboard)
+    app.register_blueprint(user_login)
+    app.register_blueprint(user_logout)
+    app.register_blueprint(home)
     app.register_blueprint(match)
 
     return app

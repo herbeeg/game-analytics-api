@@ -1,4 +1,12 @@
+import datetime
+
 from flask import Blueprint, jsonify, request
+from app.database import db
+
+from app.models.activation import Activation
+from app.models.user import User
+
+from werkzeug.security import generate_password_hash
 
 registration = Blueprint('registration', __name__)
 
