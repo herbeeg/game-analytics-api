@@ -1,6 +1,9 @@
-import click
+import click, uuid
 
 from flask import Blueprint
+
+from app.models.activation import Activation
+from app.database import db
 
 task = Blueprint('task', __name__)
 

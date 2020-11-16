@@ -9,27 +9,29 @@ from app.database import db
 
 TEST_DB = 'test.db'
 
-class TestMainCase:
+class TestTaskCLI:
     @pytest.fixture
     def client(self):
         BASE_DIR = Path(__file__).resolve().parent.parent
 
-        app = create_app()
+        self.app = create_app()
 
-        app.config['TESTING'] = True
-        app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR.joinpath(TEST_DB)}'
+        self.app.config['TESTING'] = True
+        self.app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR.joinpath(TEST_DB)}'
 
         db.create_all()
 
-        with app.test_client(self) as client:
+        with self.app.test_client(self) as client:
             yield client
 
         db.drop_all()
 
     def testActivationKeyGeneration(self, client):
-        runner = app.test_cli_runner()
-        result = runner.invoke(args=['generate-activation-key'])
+        runner = self.app.test_cli_runner()
+        result = runner.invoke(args=['task','generate-activation-key'])
+
+        print(result.output)
 
         activation = db.session.query(Activation).filter_by(id=1).first()
 

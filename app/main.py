@@ -7,6 +7,7 @@ from app.routes.login import user_login
 from app.routes.logout import user_logout
 from app.routes.dashboard import home
 from app.routes.match import match
+from app.routes.cli import task
 from app.database import db
 from app.jwt import jwt
 
@@ -50,6 +51,7 @@ def create_app():
     app.register_blueprint(user_logout)
     app.register_blueprint(home)
     app.register_blueprint(match)
+    app.register_blueprint(task)
 
     return app
 
