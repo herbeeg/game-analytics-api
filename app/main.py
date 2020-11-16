@@ -2,6 +2,8 @@ import click, datetime, json, os, sqlite3, uuid
 
 from app.routes.index import overview
 from app.routes.register import registration
+from app.routes.login import login
+from app.routes.logout import logout
 from app.database import db
 
 from dotenv import find_dotenv, load_dotenv
@@ -39,60 +41,15 @@ def create_app():
     jwt = JWTManager(app)
     """Setup the Flask-JWT-Extended extension."""
 
+    from app.routes.jwt import claims
+    app.register_blueprint(claims)
+
     app.register_blueprint(overview)
     app.register_blueprint(registration)
+    app.register_blueprint(login)
+    app.register_blueprint(logout)
 
     return app
-
-@jwt.user_claims_loader
-def addClaimsToAccessToken(identity):
-    users = db.session.query(User).filter_by(username=identity).all()
-
-    return {
-        'username': identity,
-        'id': users[0].id
-    }
-
-@app.route('/login', methods=['POST'])
-def login():
-    """
-    Manage user login authentication via
-    POST only, through offsite React
-    input fields.
-    """
-    error = None
-
-    if 'POST' == request.method:
-        users = db.session.query(User).filter_by(email=request.json['email']).all()
-
-        if not users:
-            error = 'Invalid email.'
-        elif not check_password_hash(users[0].password, request.json['password']):
-            error = 'Invalid password.'
-        else:
-            message = 'Login successful.'
-            access_token = create_access_token(identity=users[0].username)
-
-            return jsonify({
-                'access_token': access_token,
-                'message': message
-            }), 200
-
-        return jsonify({
-            'message': error
-        }), 400
-
-@app.route('/logout', methods=['GET'])
-def logout():
-    """
-    Invalidate current user session via
-    a GET request.
-    """
-    message = 'Logout successful.'
-
-    return jsonify({
-        'message': message
-    }), 200
 
 @app.route('/dashboard', methods=['GET'])
 @jwt_required
