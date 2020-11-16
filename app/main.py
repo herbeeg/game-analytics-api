@@ -1,9 +1,12 @@
 import click, datetime, json, os, sqlite3, uuid
 
+from app.routes.index import overview
+from app.routes.register import registration
+from app.database import db
+
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt_claims
-from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -19,14 +22,6 @@ SQLALCHEMY_DATABASE_URI = os.getenv(
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 
-app = Flask(__name__)
-app.config.from_object(__name__)
-
-jwt = JWTManager(app)
-"""Setup the Flask-JWT-Extended extension."""
-
-db = SQLAlchemy(app)
-
 from app.matrix.generator import MatrixGenerator
 from app.matrix.position import TurnPositions
 
@@ -35,11 +30,19 @@ from app.models.match import Match
 from app.models.match_meta import MatchMeta
 from app.models.user import User
 
-from app.routes.index import overview
-from app.routes.register import registration
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(__name__)
 
-app.register_blueprint(overview)
-app.register_blueprint(registration)
+    db.init_app(app)
+
+    jwt = JWTManager(app)
+    """Setup the Flask-JWT-Extended extension."""
+
+    app.register_blueprint(overview)
+    app.register_blueprint(registration)
+
+    return app
 
 @jwt.user_claims_loader
 def addClaimsToAccessToken(identity):
@@ -416,4 +419,6 @@ def generate_single_activation_key():
         click.echo('Random activation key could not be generated.', nl=False)
 
 if '__main__' == __name__:
+    app = create_app()
+
     app.run(port=5000)

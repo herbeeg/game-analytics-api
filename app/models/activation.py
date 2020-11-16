@@ -1,6 +1,6 @@
 import uuid
 
-from app.main import db
+from app.database import db
 
 class Activation(db.Model):
     """
