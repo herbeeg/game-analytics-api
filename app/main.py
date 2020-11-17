@@ -9,6 +9,7 @@ from app.routes.dashboard import home
 from app.routes.match import match
 from app.routes.cli import task
 from app.routes.turn import turn
+from app.routes.profile import user_profile
 from app.database import db
 from app.jwt import jwt
 
@@ -47,6 +48,7 @@ def create_app():
     app.register_blueprint(registration)
     app.register_blueprint(user_login)
     app.register_blueprint(user_logout)
+    app.register_blueprint(user_profile)
     app.register_blueprint(home)
     app.register_blueprint(match)
     app.register_blueprint(turn)

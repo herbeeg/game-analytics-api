@@ -14,39 +14,41 @@ class TestProtectedProfile:
     def client(self):
         BASE_DIR = Path(__file__).resolve().parent.parent
 
-        app.config['TESTING'] = True
-        app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR.joinpath(TEST_DB)}'
+        self.app = create_app()
 
-        app.config['EMAIL'] = 'admin@test.com'
-        app.config['USERNAME'] = 'admin'
-        app.config['PASSWORD'] = 'password'
-        app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
-        app.config['ACTIVATION_KEY_2'] = '97a56754b27e4cbea94e6c7ca9884b2b'
+        self.app.config['TESTING'] = True
+        self.app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR.joinpath(TEST_DB)}'
+
+        self.app.config['EMAIL'] = 'admin@test.com'
+        self.app.config['USERNAME'] = 'admin'
+        self.app.config['PASSWORD'] = 'password'
+        self.app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
+        self.app.config['ACTIVATION_KEY_2'] = '97a56754b27e4cbea94e6c7ca9884b2b'
 
         db.create_all()
 
-        key_first = Activation(app.config['ACTIVATION_KEY'])
-        key_second = Activation(app.config['ACTIVATION_KEY_2'])
+        key_first = Activation(self.app.config['ACTIVATION_KEY'])
+        key_second = Activation(self.app.config['ACTIVATION_KEY_2'])
         """Use fixed activation key strings for testing purposes."""
         db.session.add(key_first)
         db.session.add(key_second)
         db.session.commit()
 
-        with app.test_client(self) as client:
+        with self.app.test_client(self) as client:
             yield client
 
         db.drop_all()
 
     def testProfile(self, client):
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
-        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+        rv = register(client, self.app.config['EMAIL'], self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY'])
+        rv = login(client, self.app.config['EMAIL'], self.app.config['PASSWORD'])
 
         response = profile(client, 1, json.loads(rv.data)['access_token'])
 
         assert 200 == response.status_code
-        assert app.config['EMAIL'] in response.json['email']
-        assert app.config['USERNAME'] in response.json['username']
+        assert self.app.config['EMAIL'] in response.json['email']
+        assert self.app.config['USERNAME'] in response.json['username']
 
         date_obj = datetime.datetime.strptime(response.json['created_at'], '%a, %d %b %Y %H:%M:%S %Z')
         assert datetime.datetime.now().strftime('%Y-%m-%d') in date_obj.strftime('%Y-%m-%d')
@@ -63,8 +65,8 @@ class TestProtectedProfile:
         assert 400 == response.status_code
         assert 'User does not exist.' in response.json['message']
 
-        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY_2'])
-        new_rv = login(client, '1' + app.config['EMAIL'], app.config['PASSWORD'])
+        new_rv = register(client, '1' + self.app.config['EMAIL'], '1' + self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY_2'])
+        new_rv = login(client, '1' + self.app.config['EMAIL'], self.app.config['PASSWORD'])
 
         response = profile(client, 2, json.loads(new_rv.data)['access_token'])
 

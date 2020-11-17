@@ -1,9 +1,12 @@
-from flask import Blueprint
-from flask_jwt_extended import jwt_required
+from flask import Blueprint, jsonify
+from flask_jwt_extended import get_jwt_claims, get_jwt_identity, jwt_required
 
-profile = Blueprint('profile', __name__)
+from app.database import db
+from app.models.user import User
 
-@profile.route('/profile/<user_id>', methods=['GET'])
+user_profile = Blueprint('user_profile', __name__)
+
+@user_profile.route('/profile/<user_id>', methods=['GET'])
 @jwt_required
 def profile(user_id):
     claims = get_jwt_claims()
