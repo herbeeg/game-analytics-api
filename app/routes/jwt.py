@@ -1,7 +1,7 @@
 from flask import Blueprint
+
 from app.database import db
 from app.jwt import jwt
-
 from app.models.user import User
 
 claims = Blueprint('claims', __name__)

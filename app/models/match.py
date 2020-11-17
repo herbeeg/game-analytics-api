@@ -1,4 +1,5 @@
-import datetime, uuid
+import datetime
+import uuid
 
 from app.database import db
 

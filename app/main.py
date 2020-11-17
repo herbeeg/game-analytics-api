@@ -1,4 +1,5 @@
-import os, uuid
+import os
+import uuid
 
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask
@@ -6,7 +7,6 @@ from pathlib import Path
 
 from app.database import db
 from app.jwt import jwt
-
 from app.routes.cli import task
 from app.routes.dashboard import home
 from app.routes.index import overview
