@@ -1,6 +1,6 @@
 import datetime, uuid
 
-from app.main import db
+from app.database import db
 
 class Match(db.Model):
     """

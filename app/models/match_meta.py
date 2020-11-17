@@ -1,6 +1,6 @@
 import datetime
 
-from app.main import db
+from app.database import db
 
 class MatchMeta(db.Model):
     """

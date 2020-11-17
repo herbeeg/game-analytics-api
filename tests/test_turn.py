@@ -17,35 +17,35 @@ class TestNextTurn:
     def client(self):
         BASE_DIR = Path(__file__).resolve().parent.parent
 
-        app = create_app()
+        self.app = create_app()
 
-        app.config['TESTING'] = True
-        app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR.joinpath(TEST_DB)}'
+        self.app.config['TESTING'] = True
+        self.app.config['DATABASE'] = BASE_DIR.joinpath(TEST_DB)
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR.joinpath(TEST_DB)}'
 
-        app.config['EMAIL'] = 'admin@test.com'
-        app.config['USERNAME'] = 'admin'
-        app.config['PASSWORD'] = 'password'
-        app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
-        app.config['ACTIVATION_KEY_2'] = '97a56754b27e4cbea94e6c7ca9884b2b'
+        self.app.config['EMAIL'] = 'admin@test.com'
+        self.app.config['USERNAME'] = 'admin'
+        self.app.config['PASSWORD'] = 'password'
+        self.app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
+        self.app.config['ACTIVATION_KEY_2'] = '97a56754b27e4cbea94e6c7ca9884b2b'
 
         db.create_all()
 
-        key_first = Activation(app.config['ACTIVATION_KEY'])
-        key_second = Activation(app.config['ACTIVATION_KEY_2'])
+        key_first = Activation(self.app.config['ACTIVATION_KEY'])
+        key_second = Activation(self.app.config['ACTIVATION_KEY_2'])
         """Use fixed activation key strings for testing purposes."""
         db.session.add(key_first)
         db.session.add(key_second)
         db.session.commit()
 
-        with app.test_client(self) as client:
+        with self.app.test_client(self) as client:
             yield client
 
         db.drop_all()
 
     def testUpdateTurn(self, client):
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
-        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+        rv = register(client, self.app.config['EMAIL'], self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY'])
+        rv = login(client, self.app.config['EMAIL'], self.app.config['PASSWORD'])
 
         access_token = json.loads(rv.data)['access_token']
         rv = newMatch(
@@ -128,8 +128,8 @@ class TestNextTurn:
         assert 6 == turn_meta['player_2']['characters'][2]['position']['y']
 
     def testUpdateTurnOtherOwners(self, client):
-        rv = register(client, app.config['EMAIL'], app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY'])
-        rv = login(client, app.config['EMAIL'], app.config['PASSWORD'])
+        rv = register(client, self.app.config['EMAIL'], self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY'])
+        rv = login(client, self.app.config['EMAIL'], self.app.config['PASSWORD'])
 
         access_token = json.loads(rv.data)['access_token']
         rv = newMatch(
@@ -157,8 +157,8 @@ class TestNextTurn:
             access_token
         )
 
-        new_rv = register(client, '1' + app.config['EMAIL'], '1' + app.config['USERNAME'], app.config['PASSWORD'], app.config['ACTIVATION_KEY_2'])
-        new_rv = login(client, '1' + app.config['EMAIL'], app.config['PASSWORD'])
+        new_rv = register(client, '1' + self.app.config['EMAIL'], '1' + self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY_2'])
+        new_rv = login(client, '1' + self.app.config['EMAIL'], self.app.config['PASSWORD'])
 
         new_access_token = json.loads(new_rv.data)['access_token']
 
