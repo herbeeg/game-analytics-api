@@ -31,6 +31,15 @@ SQLALCHEMY_DATABASE_URI = os.getenv(
 SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 
 def create_app():
+    """
+    Register all of our separated route files as Flask 
+    Blueprints with their own group names to
+    maintain a readable and coherent
+    structure.
+
+    Returns:
+        Flask: Main app Flask object
+    """
     app = Flask(__name__)
     app.config.from_object(__name__)
 
