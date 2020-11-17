@@ -8,6 +8,7 @@ from app.routes.logout import user_logout
 from app.routes.dashboard import home
 from app.routes.match import match
 from app.routes.cli import task
+from app.routes.turn import turn
 from app.database import db
 from app.jwt import jwt
 
@@ -29,9 +30,6 @@ SQLALCHEMY_DATABASE_URI = os.getenv(
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 
-from app.matrix.generator import MatrixGenerator
-from app.matrix.position import TurnPositions
-
 from app.models.activation import Activation
 from app.models.match import Match
 from app.models.match_meta import MatchMeta
@@ -51,6 +49,7 @@ def create_app():
     app.register_blueprint(user_logout)
     app.register_blueprint(home)
     app.register_blueprint(match)
+    app.register_blueprint(turn)
     app.register_blueprint(task)
 
     return app

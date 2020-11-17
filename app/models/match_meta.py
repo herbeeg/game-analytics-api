@@ -1,5 +1,3 @@
-import datetime
-
 from app.database import db
 
 class MatchMeta(db.Model):

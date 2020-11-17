@@ -5,6 +5,9 @@ from app.database import db
 from app.models.match import Match
 from app.models.match_meta import MatchMeta
 
+from app.matrix.generator import MatrixGenerator
+from app.matrix.position import TurnPositions
+
 turn = Blueprint('turn', __name__)
 
 @turn.route('/turn/update/<uuid>', methods=['POST'])
