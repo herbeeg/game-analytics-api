@@ -257,7 +257,7 @@ def getSimulationTurnData(index):
         ]
     }
 
-    return json.dumps(data)
+    return json.dumps(data['turns'][index])
 
 def getProjectedMatrix():
     return [
