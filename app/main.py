@@ -1,23 +1,22 @@
-import datetime, json, os, sqlite3, uuid
+import os, uuid
 
-from app.routes.jwt import claims
-from app.routes.index import overview
-from app.routes.register import registration
-from app.routes.login import user_login
-from app.routes.logout import user_logout
-from app.routes.dashboard import home
-from app.routes.match import match
-from app.routes.cli import task
-from app.routes.turn import turn
-from app.routes.profile import user_profile
+from dotenv import find_dotenv, load_dotenv
+from flask import Flask
+from pathlib import Path
+
 from app.database import db
 from app.jwt import jwt
 
-from dotenv import find_dotenv, load_dotenv
-from flask import Flask, jsonify, request
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, get_jwt_claims
-from pathlib import Path
-from werkzeug.security import check_password_hash, generate_password_hash
+from app.routes.cli import task
+from app.routes.dashboard import home
+from app.routes.index import overview
+from app.routes.jwt import claims
+from app.routes.login import user_login
+from app.routes.logout import user_logout
+from app.routes.match import match
+from app.routes.profile import user_profile
+from app.routes.register import registration
+from app.routes.turn import turn
 
 basedir = Path(__file__).resolve().parent
 load_dotenv(find_dotenv())
@@ -30,11 +29,6 @@ SQLALCHEMY_DATABASE_URI = os.getenv(
     f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
-
-from app.models.activation import Activation
-from app.models.match import Match
-from app.models.match_meta import MatchMeta
-from app.models.user import User
 
 def create_app():
     app = Flask(__name__)
