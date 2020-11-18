@@ -8,7 +8,7 @@ from app.database import db
 from app.main import create_app
 from app.models.activation import Activation
 from tests.helpers import getMatchData, getSimulationTurnData
-from tests.utils import endMatch, login, logout, newMatch, nextTurn, profile, register, startMatch
+from tests.utils import endMatch, login, logout, newMatch, nextTurn, profile, register, startMatch, viewHistory
 
 TEST_DB = 'test.db'
 
@@ -145,3 +145,23 @@ class TestProtectedProfile:
         assert int(datetime.datetime.utcnow().timestamp()) < response.json['match_history'][2]['ended_at']
         assert int(datetime.datetime.utcnow().timestamp()) < response.json['match_history'][3]['ended_at']
         assert int(datetime.datetime.utcnow().timestamp()) < response.json['match_history'][4]['ended_at']
+
+        response = client.get(
+            '/profile/1',
+            follow_redirects=False
+        )
+
+        assert 401 == response.status_code
+
+        response = profile(client, 117, access_token)
+
+        assert 400 == response.status_code
+        assert 'User does not exist.' in response.json['message']
+
+        new_rv = register(client, '1' + self.app.config['EMAIL'], '1' + self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY_2'])
+        new_rv = login(client, '1' + self.app.config['EMAIL'], self.app.config['PASSWORD'])
+
+        response = profile(client, 2, access_token)
+
+        assert 400 == response.status_code
+        assert 'Cannot retrieve match history from another user.' in response.json['message']

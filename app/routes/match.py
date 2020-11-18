@@ -30,7 +30,7 @@ def newMatch():
                 db.session.add(new_match)
                 db.session.commit()
 
-                match_data = db.session.query(Match).filter_by(user_id=claims['id']).order_by(Match.created_at.desc()).one()
+                match_data = db.session.query(Match).filter_by(user_id=claims['id']).order_by(Match.created_at.desc()).first()
 
                 try:
                     uuid = match_data.uuid
