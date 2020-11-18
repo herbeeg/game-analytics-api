@@ -40,11 +40,17 @@ def nextTurn(uuid):
                     match_meta = MatchMeta(
                         uuid,
                         'turns',
-                        request.json
+                        {'turns':[request.json]}
                     )
-                
-                db.session.add(match_meta)
-                db.session.commit()
+                    """Wrap JSON request for 'turns' key reference during first assignment."""
+
+                    db.session.add(match_meta)
+                    db.session.commit()
+                else:
+                    temp = turn_meta.value
+                    temp['turns'].append(request.json)
+                    turn_meta = temp
+                    db.session.commit()
 
                 message = 'Turn completed.'
 

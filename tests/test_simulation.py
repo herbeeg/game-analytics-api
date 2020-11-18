@@ -2,11 +2,12 @@ import datetime, json, pytest
 
 from pathlib import Path
 
-from app.models.activation import Activation
-from app.main import create_app
 from app.database import db
+from app.main import create_app
+from app.models.activation import Activation
+from app.models.match_meta import MatchMeta
 from tests.helpers import getMatchData, getSimplifiedPlayer1Data, getSimplifiedPlayer2Data, getSimulationTurnData
-from tests.utils import login, logout, newMatch, nextTurn, register, startMatch
+from tests.utils import endMatch, login, logout, newMatch, nextTurn, register, startMatch
 
 TEST_DB = 'test.db'
 
@@ -75,23 +76,23 @@ class TestMatchSimulation:
         assert 200 == response.status_code
 
         turn_meta = db.session.query(MatchMeta).filter_by(match_id=uuid, key='turns').one()
-        turn_meta = turn_meta.value['turns']
+        turn_data = turn_meta.value['turns']
 
-        assert 10 == len(turn_meta)
+        assert 10 == len(turn_data)
         """Check that the looped turns have passed."""
 
-        for n in len(turn_meta):
+        for n in len(turn_data):
             count = 0
-            for c in turn_meta[n]['player_1']['characters']:
+            for c in turn_data[n]['player_1']['characters']:
                 assert 'move' in c['action']
                 assert getSimplifiedPlayer1Data()[n][count][0] == c['position']['x']
                 assert getSimplifiedPlayer1Data()[n][count][1] == c['position']['y']
 
                 count += 1
 
-        for n in len(turn_meta):
+        for n in len(turn_data):
             count = 0
-            for c in turn_meta[n]['player_2']['characters']:
+            for c in turn_data[n]['player_2']['characters']:
                 assert 'move' in c['action']
                 assert getSimplifiedPlayer2Data()[n][count][0] == c['position']['x']
                 assert getSimplifiedPlayer2Data()[n][count][1] == c['position']['y']
