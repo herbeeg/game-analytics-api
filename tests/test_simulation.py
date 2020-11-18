@@ -81,20 +81,22 @@ class TestMatchSimulation:
         assert 10 == len(turn_data)
         """Check that the looped turns have passed."""
 
-        for n in len(turn_data):
+        for index, turn in enumerate(turn_data):
             count = 0
-            for c in turn_data[n]['player_1']['characters']:
-                assert 'move' in c['action']
-                assert getSimplifiedPlayer1Data()[n][count][0] == c['position']['x']
-                assert getSimplifiedPlayer1Data()[n][count][1] == c['position']['y']
+
+            for character in turn['player_1']['characters']:
+                assert 'move' in character['action']
+                assert getSimplifiedPlayer1Data()[index][count][0] == character['position']['x']
+                assert getSimplifiedPlayer1Data()[index][count][1] == character['position']['y']
 
                 count += 1
 
-        for n in len(turn_data):
+        for index, turn in enumerate(turn_data):
             count = 0
-            for c in turn_data[n]['player_2']['characters']:
-                assert 'move' in c['action']
-                assert getSimplifiedPlayer2Data()[n][count][0] == c['position']['x']
-                assert getSimplifiedPlayer2Data()[n][count][1] == c['position']['y']
+
+            for character in turn['player_2']['characters']:
+                assert 'move' in character['action']
+                assert getSimplifiedPlayer2Data()[index][count][0] == character['position']['x']
+                assert getSimplifiedPlayer2Data()[index][count][1] == character['position']['y']
 
                 count += 1

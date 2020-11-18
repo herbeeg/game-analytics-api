@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_claims, get_jwt_identity, jwt_required
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.database import db
 from app.matrix.generator import MatrixGenerator
@@ -47,9 +48,10 @@ def nextTurn(uuid):
                     db.session.add(match_meta)
                     db.session.commit()
                 else:
-                    temp = turn_meta.value
-                    temp['turns'].append(request.json)
-                    turn_meta = temp
+                    turn_meta.value['turns'].append(request.json)
+                    """Directly update with new turn metadata."""
+                    flag_modified(turn_meta, 'value')
+                    """Allowing us to persist JSON that has been updated."""
                     db.session.commit()
 
                 message = 'Turn completed.'
