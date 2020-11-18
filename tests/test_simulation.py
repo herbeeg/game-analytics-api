@@ -5,7 +5,7 @@ from pathlib import Path
 from app.models.activation import Activation
 from app.main import create_app
 from app.database import db
-from tests.helpers import getMatchData, getSimulationTurnData
+from tests.helpers import getMatchData, getSimplifiedPlayer1Data, getSimplifiedPlayer2Data, getSimulationTurnData
 from tests.utils import login, logout, newMatch, nextTurn, register, startMatch
 
 TEST_DB = 'test.db'
@@ -73,3 +73,27 @@ class TestMatchSimulation:
         )
 
         assert 200 == response.status_code
+
+        turn_meta = db.session.query(MatchMeta).filter_by(match_id=uuid, key='turns').one()
+        turn_meta = turn_meta.value['turns']
+
+        assert 10 == len(turn_meta)
+        """Check that the looped turns have passed."""
+
+        for n in len(turn_meta):
+            count = 0
+            for c in turn_meta[n]['player_1']['characters']:
+                assert 'move' in c['action']
+                assert getSimplifiedPlayer1Data()[n][count][0] == c['position']['x']
+                assert getSimplifiedPlayer1Data()[n][count][1] == c['position']['y']
+
+                count += 1
+
+        for n in len(turn_meta):
+            count = 0
+            for c in turn_meta[n]['player_2']['characters']:
+                assert 'move' in c['action']
+                assert getSimplifiedPlayer2Data()[n][count][0] == c['position']['x']
+                assert getSimplifiedPlayer2Data()[n][count][1] == c['position']['y']
+
+                count += 1
