@@ -87,6 +87,7 @@ class TestProtectedProfile:
 
         access_token = json.loads(rv.data)['access_token']
         uuids = []
+        test_started = int(datetime.datetime.utcnow().timestamp())
 
         for m in range(5):
             rv = newMatch(
@@ -144,11 +145,11 @@ class TestProtectedProfile:
         assert ('Match 1 - ' + uuids[3]) in response.json['match_history'][3]['name']
         assert ('Match 1 - ' + uuids[4]) in response.json['match_history'][4]['name']
 
-        assert int(datetime.datetime.utcnow().timestamp()) < response.json['match_history'][0]['ended_at']
-        assert int(datetime.datetime.utcnow().timestamp()) < response.json['match_history'][1]['ended_at']
-        assert int(datetime.datetime.utcnow().timestamp()) < response.json['match_history'][2]['ended_at']
-        assert int(datetime.datetime.utcnow().timestamp()) < response.json['match_history'][3]['ended_at']
-        assert int(datetime.datetime.utcnow().timestamp()) < response.json['match_history'][4]['ended_at']
+        assert test_started < response.json['match_history'][0]['ended_at']
+        assert test_started < response.json['match_history'][1]['ended_at']
+        assert test_started < response.json['match_history'][2]['ended_at']
+        assert test_started < response.json['match_history'][3]['ended_at']
+        assert test_started < response.json['match_history'][4]['ended_at']
 
         response = client.get(
             '/profile/1/history',
@@ -157,7 +158,7 @@ class TestProtectedProfile:
 
         assert 401 == response.status_code
 
-        response = profile(client, 117, access_token)
+        response = viewHistory(client, 117, access_token)
 
         assert 400 == response.status_code
         assert 'User does not exist.' in response.json['message']
@@ -165,7 +166,7 @@ class TestProtectedProfile:
         new_rv = register(client, '1' + self.app.config['EMAIL'], '1' + self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY_2'])
         new_rv = login(client, '1' + self.app.config['EMAIL'], self.app.config['PASSWORD'])
 
-        response = profile(client, 2, access_token)
+        response = viewHistory(client, 2, access_token)
 
         assert 400 == response.status_code
         assert 'Cannot retrieve match history from another user.' in response.json['message']

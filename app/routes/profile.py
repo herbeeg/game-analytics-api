@@ -61,10 +61,16 @@ def history(user_id):
             message = 'No previous matches found.'
         else:
             for match in matches:
+                ended = db.session.query(
+                    MatchMeta
+                ).filter_by(
+                    match_id=match.uuid, key='timing'
+                ).first().value['elapsed_time'] + match.created_at
+
                 history.append({
                     'id': match.uuid,
                     'name': match.title + ' - ' + match.uuid,
-                    'ended_at': db.session.query(MatchMeta).filter_by(match_id=match.uuid, key='timing').first().value['elapsed_time']
+                    'ended_at': ended
                 })
 
             message = 'Match data returned successfully.'
