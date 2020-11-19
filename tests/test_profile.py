@@ -9,7 +9,7 @@ from app.database import db
 from app.main import create_app
 from app.models.activation import Activation
 from tests.helpers import getMatchData, getSimulationTurnData
-from tests.utils import endMatch, login, logout, newMatch, nextTurn, profile, register, startMatch, viewHistory
+from tests.utils import endMatch, login, logout, newMatch, nextTurn, profile, register, startMatch, viewHistory, viewStats
 
 TEST_DB = 'test.db'
 
@@ -170,3 +170,54 @@ class TestProtectedProfile:
 
         assert 400 == response.status_code
         assert 'Cannot retrieve match history from another user.' in response.json['message']
+
+    def testUserStatistics(self, client):
+        rv = register(client, self.app.config['EMAIL'], self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY'])
+        rv = login(client, self.app.config['EMAIL'], self.app.config['PASSWORD'])
+
+        access_token = json.loads(rv.data)['access_token']
+
+        for m in range(5):
+            """Scaffold some test match data for stats fetching."""
+            rv = newMatch(
+                client,
+                getMatchData(),
+                access_token
+            )
+
+            uuid = json.loads(rv.data)['uuid']
+            response = startMatch(
+                client,
+                uuid,
+                access_token
+            )
+
+            for n in range(10):
+                rv = nextTurn(
+                    client,
+                    uuid,
+                    getSimulationTurnData(n),
+                    access_token
+                )
+
+            time.sleep(2)
+            """Wait before ending the match to test final elapsed time."""
+
+            response = endMatch(
+                client,
+                uuid,
+                access_token
+            )
+
+        response = viewStats(
+            client,
+            1,
+            access_token
+        )
+
+        assert 200 == response.status_code
+        assert response.json['stats']
+
+        assert 10 == response.json['stats']['match_time']
+
+        assert 5 == response.json['stats']['completed']

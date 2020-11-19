@@ -89,3 +89,12 @@ def viewHistory(client, user_id, access_token):
         },
         follow_redirects=False
     )
+
+def viewStats(client, user_id, access_token):
+    return client.get(
+        f'/profile/{user_id}/stats',
+        headers={
+            'Authorization': 'Bearer ' + access_token
+        },
+        follow_redirects=False
+    )
