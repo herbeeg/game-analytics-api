@@ -151,7 +151,7 @@ class TestProtectedProfile:
         assert int(datetime.datetime.utcnow().timestamp()) < response.json['match_history'][4]['ended_at']
 
         response = client.get(
-            '/profile/1',
+            '/profile/1/history',
             follow_redirects=False
         )
 

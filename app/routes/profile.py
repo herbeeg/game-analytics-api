@@ -55,8 +55,24 @@ def history(user_id):
             MatchMeta.key == 'timing'
         ).all()
 
-        for match in matches:
-            print(match.uuid)
+        history = []
+
+        if not matches:
+            message = 'No previous matches found.'
+        else:
+            for match in matches:
+                history.append({
+                    'id': match.uuid,
+                    'name': match.title + ' - ' + match.uuid,
+                    'ended_at': db.session.query(MatchMeta).filter_by(match_id=match.uuid, key='timing').first().value['elapsed_time']
+                })
+
+            message = 'Match data returned successfully.'
+
+        return jsonify({
+            'message': message,
+            'match_history': history
+        }), 200
     
     return jsonify({
         'message': error
