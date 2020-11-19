@@ -200,7 +200,7 @@ class TestProtectedProfile:
                     access_token
                 )
 
-            time.sleep(2)
+            time.sleep(4.95)
             """Wait before ending the match to test final elapsed time."""
 
             response = endMatch(
@@ -218,6 +218,26 @@ class TestProtectedProfile:
         assert 200 == response.status_code
         assert response.json['stats']
 
-        assert 10 == response.json['stats']['match_time']
+        assert 25 == response.json['stats']['match_time']
 
         assert 5 == response.json['stats']['completed']
+
+        response = client.get(
+            '/profile/1/stats',
+            follow_redirects=False
+        )
+
+        assert 401 == response.status_code
+
+        response = viewStats(client, 117, access_token)
+
+        assert 400 == response.status_code
+        assert 'User does not exist.' in response.json['message']
+
+        new_rv = register(client, '1' + self.app.config['EMAIL'], '1' + self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY_2'])
+        new_rv = login(client, '1' + self.app.config['EMAIL'], self.app.config['PASSWORD'])
+
+        response = viewStats(client, 2, access_token)
+
+        assert 400 == response.status_code
+        assert 'Cannot retrieve statistics from another user.' in response.json['message']

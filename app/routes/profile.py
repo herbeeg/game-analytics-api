@@ -83,3 +83,46 @@ def history(user_id):
     return jsonify({
         'message': error
     }), 400
+
+@user_profile.route('/profile/<user_id>/stats', methods=['GET'])
+@jwt_required
+def stats(user_id):
+    claims = get_jwt_claims()
+    username = get_jwt_identity()
+    users = db.session.query(User).filter_by(id=user_id).all()
+
+    error = None
+
+    if not users:
+        error = 'User does not exist.'
+    elif int(user_id) != claims['id']:
+        error = 'Cannot retrieve statistics from another user.'
+    else:
+        matches = db.session.query(
+            Match
+        ).join(
+            MatchMeta, Match.uuid == MatchMeta.match_id
+        ).filter(
+            Match.user_id == user_id,
+            MatchMeta.key == 'timing'
+        ).all()
+
+        total = 0
+
+        for match in matches:
+            total += db.session.query(
+                MatchMeta
+            ).filter_by(
+                match_id=match.uuid, key='timing'
+            ).first().value['elapsed_time']
+
+        return jsonify({
+            'stats': {
+                'match_time': total,
+                'completed': len(matches)
+            }
+        })
+    
+    return jsonify({
+        'message': error
+    }), 400
