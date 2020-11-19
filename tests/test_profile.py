@@ -1,6 +1,7 @@
 import datetime
 import json
 import pytest
+import time
 
 from pathlib import Path
 
@@ -110,6 +111,9 @@ class TestProtectedProfile:
                 )
 
                 assert 200 == rv.status_code
+
+            time.sleep(2)
+            """Wait before ending the match to test final elapsed time."""
 
             response = endMatch(
                 client,

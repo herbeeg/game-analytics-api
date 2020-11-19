@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify
 from flask_jwt_extended import get_jwt_claims, get_jwt_identity, jwt_required
 
 from app.database import db
+from app.models.match import Match
+from app.models.match_meta import MatchMeta
 from app.models.user import User
 
 user_profile = Blueprint('user_profile', __name__)
@@ -44,8 +46,17 @@ def history(user_id):
     elif int(user_id) != claims['id']:
         error = 'Cannot retrieve match history from another user.'
     else:
-        # Do something.
-        print('do')
+        matches = db.session.query(
+            Match
+        ).join(
+            MatchMeta, Match.uuid == MatchMeta.match_id
+        ).filter(
+            Match.user_id == user_id
+        ).all()
+
+        for match in matches:
+            # Do something
+            print('dd')
     
     return jsonify({
         'message': error
