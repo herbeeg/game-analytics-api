@@ -51,12 +51,12 @@ def history(user_id):
         ).join(
             MatchMeta, Match.uuid == MatchMeta.match_id
         ).filter(
-            Match.user_id == user_id
+            Match.user_id == user_id,
+            MatchMeta.key == 'timing'
         ).all()
 
         for match in matches:
-            # Do something
-            print('dd')
+            print(match.uuid)
     
     return jsonify({
         'message': error
