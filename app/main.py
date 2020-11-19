@@ -8,7 +8,6 @@ from pathlib import Path
 from app.database import db
 from app.jwt import jwt
 from app.routes.cli import task
-from app.routes.dashboard import home
 from app.routes.index import overview
 from app.routes.jwt import claims
 from app.routes.login import user_login
@@ -52,7 +51,6 @@ def create_app():
     app.register_blueprint(user_login)
     app.register_blueprint(user_logout)
     app.register_blueprint(user_profile)
-    app.register_blueprint(home)
     app.register_blueprint(match)
     app.register_blueprint(turn)
     app.register_blueprint(task)
