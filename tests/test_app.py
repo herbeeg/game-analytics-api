@@ -1,11 +1,13 @@
-import datetime, json, pytest
+import datetime
+import json
+import pytest
 
 from pathlib import Path
 
+from app.database import db
+from app.main import create_app
 from app.models.activation import Activation
 from app.models.user import User
-from app.main import create_app
-from app.database import db
 from tests.utils import login, logout, register
 
 TEST_DB = 'test.db'

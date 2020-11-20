@@ -1,12 +1,13 @@
-import json, pytest
+import json
+import pytest
 
 from pathlib import Path
 
+from app.database import db
+from app.main import create_app
 from app.models.activation import Activation
 from app.models.match import Match
 from app.models.match_meta import MatchMeta
-from app.main import create_app
-from app.database import db
 from tests.helpers import getMatchData, getSingleTurnData
 from tests.utils import login, newMatch, nextTurn, register, startMatch
 

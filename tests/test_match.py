@@ -1,12 +1,15 @@
-import datetime, json, pytest, time
+import datetime
+import json
+import pytest
+import time
 
 from pathlib import Path
 
+from app.database import db
+from app.main import create_app
 from app.models.activation import Activation
 from app.models.match import Match
 from app.models.match_meta import MatchMeta
-from app.main import create_app
-from app.database import db
 from tests.helpers import getMatchData
 from tests.utils import endMatch, login, newMatch, register, startMatch
 
