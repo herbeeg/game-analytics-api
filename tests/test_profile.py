@@ -104,7 +104,6 @@ class TestProtectedProfile:
 
         response = viewHistory(
             client,
-            1,
             access_token
         )
 
@@ -132,24 +131,11 @@ class TestProtectedProfile:
         assert test_started < response.json['match_history'][4]['ended_at']
 
         response = client.get(
-            '/profile/1/history',
+            '/profile/history',
             follow_redirects=False
         )
 
         assert 401 == response.status_code
-
-        response = viewHistory(client, 117, access_token)
-
-        assert 400 == response.status_code
-        assert 'User does not exist.' in response.json['message']
-
-        new_rv = register(client, '1' + self.app.config['EMAIL'], '1' + self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY_2'])
-        new_rv = login(client, '1' + self.app.config['EMAIL'], self.app.config['PASSWORD'])
-
-        response = viewHistory(client, 2, access_token)
-
-        assert 400 == response.status_code
-        assert 'Cannot retrieve match history from another user.' in response.json['message']
 
     def testUserStatistics(self, client):
         rv = register(client, self.app.config['EMAIL'], self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY'])
@@ -191,7 +177,6 @@ class TestProtectedProfile:
 
         response = viewStats(
             client,
-            1,
             access_token
         )
 
@@ -203,21 +188,8 @@ class TestProtectedProfile:
         assert 5 == response.json['stats']['completed']
 
         response = client.get(
-            '/profile/1/stats',
+            '/profile/stats',
             follow_redirects=False
         )
 
         assert 401 == response.status_code
-
-        response = viewStats(client, 117, access_token)
-
-        assert 400 == response.status_code
-        assert 'User does not exist.' in response.json['message']
-
-        new_rv = register(client, '1' + self.app.config['EMAIL'], '1' + self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY_2'])
-        new_rv = login(client, '1' + self.app.config['EMAIL'], self.app.config['PASSWORD'])
-
-        response = viewStats(client, 2, access_token)
-
-        assert 400 == response.status_code
-        assert 'Cannot retrieve statistics from another user.' in response.json['message']

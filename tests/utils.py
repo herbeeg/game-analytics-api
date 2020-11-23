@@ -81,18 +81,18 @@ def viewTurn(client, uuid, turn_number, access_token):
         follow_redirects=False
     )
 
-def viewHistory(client, user_id, access_token):
+def viewHistory(client, access_token):
     return client.get(
-        f'/profile/{user_id}/history',
+        '/profile/history',
         headers={
             'Authorization': 'Bearer ' + access_token
         },
         follow_redirects=False
     )
 
-def viewStats(client, user_id, access_token):
+def viewStats(client, access_token):
     return client.get(
-        f'/profile/{user_id}/stats',
+        '/profile/stats',
         headers={
             'Authorization': 'Bearer ' + access_token
         },
