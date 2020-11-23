@@ -28,15 +28,12 @@ class TestProtectedProfile:
         self.app.config['USERNAME'] = 'admin'
         self.app.config['PASSWORD'] = 'password'
         self.app.config['ACTIVATION_KEY'] = '08fe47e8814b410cbaf742463e8c9252'
-        self.app.config['ACTIVATION_KEY_2'] = '97a56754b27e4cbea94e6c7ca9884b2b'
 
         db.create_all()
 
-        key_first = Activation(self.app.config['ACTIVATION_KEY'])
-        key_second = Activation(self.app.config['ACTIVATION_KEY_2'])
+        new_key = Activation(self.app.config['ACTIVATION_KEY'])
         """Use fixed activation key strings for testing purposes."""
-        db.session.add(key_first)
-        db.session.add(key_second)
+        db.session.add(new_key)
         db.session.commit()
 
         with self.app.test_client(self) as client:
@@ -48,7 +45,7 @@ class TestProtectedProfile:
         rv = register(client, self.app.config['EMAIL'], self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY'])
         rv = login(client, self.app.config['EMAIL'], self.app.config['PASSWORD'])
 
-        response = profile(client, 1, json.loads(rv.data)['access_token'])
+        response = profile(client, json.loads(rv.data)['access_token'])
 
         assert 200 == response.status_code
         assert self.app.config['EMAIL'] in response.json['email']
@@ -58,28 +55,11 @@ class TestProtectedProfile:
         assert datetime.datetime.now().strftime('%Y-%m-%d') in date_obj.strftime('%Y-%m-%d')
 
         response = client.get(
-            '/profile/1',
+            '/profile',
             follow_redirects=False
         )
 
         assert 401 == response.status_code
-
-        response = profile(client, 117, json.loads(rv.data)['access_token'])
-
-        assert 400 == response.status_code
-        assert 'User does not exist.' in response.json['message']
-
-        new_rv = register(client, '1' + self.app.config['EMAIL'], '1' + self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY_2'])
-        new_rv = login(client, '1' + self.app.config['EMAIL'], self.app.config['PASSWORD'])
-
-        response = profile(client, 2, json.loads(new_rv.data)['access_token'])
-
-        assert 200 == response.status_code
-
-        response = profile(client, 2, json.loads(rv.data)['access_token'])
-
-        assert 400 == response.status_code
-        assert 'Cannot retrieve data from another user.' in response.json['message']
 
     def testMatchHistory(self, client):
         rv = register(client, self.app.config['EMAIL'], self.app.config['USERNAME'], self.app.config['PASSWORD'], self.app.config['ACTIVATION_KEY'])

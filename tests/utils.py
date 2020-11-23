@@ -25,9 +25,9 @@ def logout(client):
         follow_redirects=False
     )
 
-def profile(client, user_id, access_token):
+def profile(client, access_token):
     return client.get(
-        f'/profile/{user_id}',
+        '/profile',
         headers={
             'Authorization': 'Bearer ' + access_token
         },
