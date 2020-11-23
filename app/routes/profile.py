@@ -88,44 +88,46 @@ def history():
         'message': error
     }), 400
 
-@user_profile.route('/profile/<user_id>/stats', methods=['GET'])
+@user_profile.route('/profile/stats', methods=['GET'])
 @jwt_required
-def stats(user_id):
+def stats():
     claims = get_jwt_claims()
     username = get_jwt_identity()
-    users = db.session.query(User).filter_by(id=user_id).all()
 
     error = None
 
-    if not users:
-        error = 'User does not exist.'
-    elif int(user_id) != claims['id']:
-        error = 'Cannot retrieve statistics from another user.'
+    if not claims['id']:
+        error = 'Invalid JWT claims provided.'
     else:
-        matches = db.session.query(
-            Match
-        ).join(
-            MatchMeta, Match.uuid == MatchMeta.match_id
-        ).filter(
-            Match.user_id == user_id,
-            MatchMeta.key == 'timing'
-        ).all()
+        user = db.session.query(User).filter_by(id=claims['id']).first()
 
-        total = 0
+        if not user:
+            error = 'User does not exist.'
+        else:
+            matches = db.session.query(
+                Match
+            ).join(
+                MatchMeta, Match.uuid == MatchMeta.match_id
+            ).filter(
+                Match.user_id == claims['id'],
+                MatchMeta.key == 'timing'
+            ).all()
 
-        for match in matches:
-            total += db.session.query(
-                MatchMeta
-            ).filter_by(
-                match_id=match.uuid, key='timing'
-            ).first().value['elapsed_time']
+            total = 0
 
-        return jsonify({
-            'stats': {
-                'match_time': total,
-                'completed': len(matches)
-            }
-        })
+            for match in matches:
+                total += db.session.query(
+                    MatchMeta
+                ).filter_by(
+                    match_id=match.uuid, key='timing'
+                ).first().value['elapsed_time']
+
+            return jsonify({
+                'stats': {
+                    'match_time': total,
+                    'completed': len(matches)
+                }
+            })
     
     return jsonify({
         'message': error
