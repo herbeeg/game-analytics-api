@@ -34,53 +34,55 @@ def profile():
         'message': error
     }), 400
 
-@user_profile.route('/profile/<user_id>/history', methods=['GET'])
+@user_profile.route('/profile/history', methods=['GET'])
 @jwt_required
-def history(user_id):
+def history():
     claims = get_jwt_claims()
     username = get_jwt_identity()
-    users = db.session.query(User).filter_by(id=user_id).all()
 
     error = None
 
-    if not users:
-        error = 'User does not exist.'
-    elif int(user_id) != claims['id']:
-        error = 'Cannot retrieve match history from another user.'
+    if not claims['id']:
+        error = 'Invalid JWT claims provided.'
     else:
-        matches = db.session.query(
-            Match
-        ).join(
-            MatchMeta, Match.uuid == MatchMeta.match_id
-        ).filter(
-            Match.user_id == user_id,
-            MatchMeta.key == 'timing'
-        ).all()
+        user = db.session.query(User).filter_by(id=claims['id']).first()
 
-        history = []
-
-        if not matches:
-            message = 'No previous matches found.'
+        if not user:
+            error = 'User does not exist.'
         else:
-            for match in matches:
-                ended = db.session.query(
-                    MatchMeta
-                ).filter_by(
-                    match_id=match.uuid, key='timing'
-                ).first().value['elapsed_time'] + match.created_at
+            matches = db.session.query(
+                Match
+            ).join(
+                MatchMeta, Match.uuid == MatchMeta.match_id
+            ).filter(
+                Match.user_id == claims['id'],
+                MatchMeta.key == 'timing'
+            ).all()
 
-                history.append({
-                    'id': match.uuid,
-                    'name': match.title + ' - ' + match.uuid,
-                    'ended_at': ended
-                })
+            history = []
 
-            message = 'Match data returned successfully.'
+            if not matches:
+                message = 'No previous matches found.'
+            else:
+                for match in matches:
+                    ended = db.session.query(
+                        MatchMeta
+                    ).filter_by(
+                        match_id=match.uuid, key='timing'
+                    ).first().value['elapsed_time'] + match.created_at
 
-        return jsonify({
-            'message': message,
-            'match_history': history
-        }), 200
+                    history.append({
+                        'id': match.uuid,
+                        'name': match.title + ' - ' + match.uuid,
+                        'ended_at': ended
+                    })
+
+                message = 'Match data returned successfully.'
+
+            return jsonify({
+                'message': message,
+                'match_history': history
+            }), 200
     
     return jsonify({
         'message': error
