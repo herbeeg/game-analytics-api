@@ -8,6 +8,8 @@ class User(db.Model):
 
     Extends the SQLAlchemy.Model class.
     """
+    __tablename__ = 'users'
+
     id = db.Column(db.Integer, unique=True, primary_key=True)
     email = db.Column(db.String, unique=True, nullable=False)
     username = db.Column(db.String, unique=True, nullable=False)
