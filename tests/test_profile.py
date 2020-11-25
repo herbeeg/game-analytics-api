@@ -181,11 +181,12 @@ class TestProtectedProfile:
         )
 
         assert 200 == response.status_code
-        assert response.json['stats']
+        assert response.json['match_time']
+        assert response.json['completed']
 
-        assert 25 == response.json['stats']['match_time']
+        assert 25 == response.json['match_time']
 
-        assert 5 == response.json['stats']['completed']
+        assert 5 == response.json['completed']
 
         response = client.get(
             '/profile/stats',

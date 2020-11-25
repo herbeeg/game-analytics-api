@@ -123,10 +123,8 @@ def stats():
                 ).first().value['elapsed_time']
 
             return jsonify({
-                'stats': {
-                    'match_time': total,
-                    'completed': len(matches)
-                }
+                'match_time': total,
+                'completed': len(matches)
             })
     
     return jsonify({
