@@ -99,7 +99,7 @@ def viewTurn(uuid, turn_number):
 
                     return jsonify({
                         'message': error
-                    })
+                    }), 400
                 
                 matrix = MatrixGenerator(positions).generate()
 
@@ -109,7 +109,7 @@ def viewTurn(uuid, turn_number):
                     'data': turn_meta,
                     'matrix': matrix,
                     'message': message
-                })
+                }), 200
             except IndexError:
                 error = 'Invalid turn number provided.'
 

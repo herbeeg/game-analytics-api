@@ -125,7 +125,7 @@ def stats():
             return jsonify({
                 'match_time': total,
                 'completed': len(matches)
-            })
+            }), 200
     
     return jsonify({
         'message': error
